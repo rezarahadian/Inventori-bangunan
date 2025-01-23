@@ -1,0 +1,98 @@
+#wrapper .sidebar {
+    background: #d4f1f4;
+}
+/* Ubah warna teks pada sidebar */
+.sidebar .nav-link,
+.sidebar .sidebar-brand-text {
+    color: #0a3d62 !important; /* Warna putih */
+}
+
+/* Ubah warna ikon pada sidebar */
+.sidebar .nav-link i {
+    color: #0a3d62 !important; /* Warna putih */
+}
+/* Ubah warna ikon pada sidebar */
+.sidebar .sidebar-brand-icon i {
+    color: #0a3d62; /* Warna biru tua */
+}
+
+/* Warna hover untuk tautan di sidebar */
+.sidebar .nav-link:hover {
+    background-color: #f1f1f1 !important; /* Warna abu-abu terang */
+}
+.fontuser {
+    color: #0a3d62; /* Warna teks biru gelap yang harmonis dengan sidebar */
+    font-size: 30px; /* Ukuran font */
+    margin-top: 15px;
+ 
+}
+/* Main Section */
+.main{
+    position: relative;
+    width: 100%;
+  }
+  .main-top{
+    display: flex;
+    width: 100%;
+  }
+  .main-skills{
+    display: flex;
+    margin-top: 0px;
+  }
+  .main-skills .card{
+    width: 25%;
+    margin: 10px;
+    background: #fff;
+    text-align: center;
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0 20px 35px rgba(106, 162, 180, 0.1);
+  }
+  .main-skills .card button:hover{
+    background: #7dbbc2;
+  }
+  .main-skills .card i{
+    font-size: 22px;
+    padding: 10px;
+  }
+  /* Menghilangkan garis bawah pada link */
+button a {
+  text-decoration: none; /* Menghilangkan garis bawah */
+  color: #e8e8e8; /* Mengganti warna font link menjadi biru (ganti dengan warna yang diinginkan) */
+}
+
+/* Mengubah warna link saat hover */
+button a:hover {
+  color: #fff; /* Mengubah warna saat hover (opsional) */
+}
+.card i {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: #0a3d62; /* Change the icon color */
+}
+/* Heading styles */
+.card h3 {
+    font-size: 1.rem;
+    color: #0a3d62; /* Change text color */
+    margin-bottom: 10px;
+}
+/* Button styles */
+.card button {
+    background-color: #a9d8dd;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+/* Link inside the button */
+.card button a {
+    text-decoration: none;
+    color: #0a3d62;
+}
+
+
+
+  

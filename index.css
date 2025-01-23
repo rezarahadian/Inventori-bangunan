@@ -1,0 +1,174 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
+  
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(to bottom, #d4f1f4, #bee3db);
+    color: #fff;
+  }
+  
+  .container {
+    display: flex;
+    width: 80%;
+    max-width: 1200px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
+  
+  .left-section {
+    flex: 1;
+    background: #d4f1f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 30px;
+  }
+  
+  .left-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .left-section p {
+    font-size: 1rem;
+    line-height: 1.5;
+    text-align: center;
+  }
+  
+  .right-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+  }
+  
+  .login-box {
+      width: 100%;
+      max-width: 400px;
+      padding: 40px;
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .login-box:hover {
+      transform: translateY(-5px);
+    }
+    
+    .login-box h2 {
+      margin-bottom: 20px;
+      color: #333;
+      text-align: center;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .input-group {
+      position: relative;
+      margin-bottom: 30px;
+    }
+    
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      outline: none;
+      transition: 0.3s;
+    }
+    
+    .input-group input:focus {
+      border-color: #d4f1f4;
+      box-shadow: 0 0 5px rgba(71, 194, 186, 0.5);
+    }
+    
+    .input-group label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: #aaa;
+      font-size: 1rem;
+      pointer-events: none;
+      transition: all 0.3s ease-in-out;
+    }
+    
+    .input-group input:focus + label,
+    .input-group input:not(:placeholder-shown) + label {
+      top: -15px;
+      left: 5px;
+      font-size: 0.8rem;
+      color: #363131;
+      background: #ffffff;
+      padding: 0 5px;
+    }
+    
+    .login-box button {
+      width: 100%;
+      padding: 10px;
+      background:  #bee3db;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    
+    .login-box button:hover {
+      background:  #d4f1f4;
+      transform: scale(1.05);
+    }
+    
+    .login-box button:active {
+      transform: scale(0.95);
+    }
+    
+  
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+    }
+  
+    .left-section {
+      padding: 20px;
+    }
+  
+    .right-section {
+      padding: 20px;
+    }
+  }
+  /* CSS untuk font */
+  body {
+      font-family: 'Roboto', sans-serif; /* Ganti dengan font lain jika diperlukan */
+    }
+    
+    .left-section h1 {
+      font-family: 'Lora', serif; /* Gunakan font serif untuk judul agar terlihat elegan */
+      font-size: 2.5rem; /* Ukuran font lebih besar untuk judul */
+      color: #363131; /* Warna font gelap agar mudah dibaca */
+      margin-bottom: 1rem;
+    }
+    
+    .left-section p {
+      font-family: 'Lora'; /* Font sans-serif untuk paragraf agar lebih mudah dibaca */
+      font-size: 1rem;
+      color: #363131; /* Warna teks yang lebih lembut untuk paragraf */
+      line-height: 1.6; /* Jarak antar baris untuk kenyamanan membaca */
+      max-width: 600px; /* Membatasi lebar teks untuk kenyamanan pembaca */
+    }
+    
