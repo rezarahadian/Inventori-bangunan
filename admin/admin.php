@@ -7,7 +7,7 @@ include 'config.php'
 session_start();
 // Periksa apakah pengguna sudah login
 if (empty($_SESSION['username']) || empty($_SESSION['role'])) {
-    echo "<script>alert('Maaf, untuk mengakses halaman ini Anda harus login terlebih dahulu.'); document.location='../login.php';</script>";
+    echo "<script>alert('Maaf, untuk mengakses halaman ini Anda harus login terlebih dahulu.'); document.location='../index.php';</script>";
     exit();
 }
 // Ambil data username dan role dari sesi
@@ -97,9 +97,9 @@ $role = $_SESSION['role'];
                     <div id="collapseLaporan" class="collapse" aria-labelledby="headingLaporan" data-parent="#accordionSidebar">
                         <div class="bg-white py-2 collapse-inner rounded">
                             <h6 class="collapse-header">Laporan:</h6>
-                            <a class="collapse-item" href="stokbarang.php">Laporan Stok Barang</a>
-                            <a class="collapse-item" href="barangmasuk.php">Laporan Barang Masuk</a>
-                            <a class="collapse-item" href="barangkeluar.php">Laporan Barang Keluar</a>
+                            <a class="collapse-item" href="laporanstok.php">Laporan Stok Barang</a>
+                            <a class="collapse-item" href="laporanmasuk.php">Laporan Barang Masuk</a>
+                            <a class="collapse-item" href="laporankeluar.php">Laporan Barang Keluar</a>
                         </div>
                     </div>
                 </li>

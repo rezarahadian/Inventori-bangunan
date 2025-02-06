@@ -27,9 +27,9 @@ if (isset($_POST['add_barang'])) {
         // Jika upload berhasil, simpan data ke database
         $sql = "INSERT INTO tb_barang (nama_barang, foto, id_kategori) VALUES ('$nama_barang', '$foto', '$id_kategori')";
         if ($config->query($sql)) {
-            header("Location: barang.php");
+            echo "<script>alert('Data berhasil ditambahkan!'); window.location.href='barang.php';</script>";
         } else {
-            echo "Error: " . $config->error;
+             echo "<script>alert('Gagal menambahkan data: " . $config->error . "');</script>";
         }
     } else {
         echo "Gagal mengupload foto.";
@@ -66,9 +66,9 @@ if (isset($_POST['update_barang'])) {
     }
 
     if ($config->query($sql)) {
-        header("Location: barang.php");
+         echo "<script>alert('Data berhasil di update!'); window.location.href='barang.php';</script>";
     } else {
-        echo "Error: " . $config->error;
+         echo "<script>alert('Gagal mengupdate data: " . $config->error . "');</script>";
     }
 }
 
@@ -77,9 +77,9 @@ if (isset($_GET['delete'])) {
     $id_barang = $_GET['delete'];
     $sql = "DELETE FROM tb_barang WHERE id_barang='$id_barang'";
     if ($config->query($sql)) {
-        header("Location: barang.php");
+         echo "<script>alert('Data berhasil di hapus'); window.location.href='barang.php';</script>";
     } else {
-        echo "Error: " . $config->error;
+         echo "<script>alert('Gagal menghapus data: " . $config->error . "');</script>";
     }
 }
 
@@ -313,6 +313,7 @@ $total_pages = ceil($total_data / $limit);
 $sql = "SELECT tb_barang.id_barang, tb_barang.nama_barang, tb_barang.foto, tb_kategori.nama_kategori 
         FROM tb_barang 
         INNER JOIN tb_kategori ON tb_barang.id_kategori = tb_kategori.id_kategori 
+        WHERE tb_barang.nama_barang LIKE '%$search%'
         LIMIT $offset, $limit";
 
 $result = $config->query($sql);

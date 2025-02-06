@@ -14,38 +14,46 @@ $username = $_SESSION['username'];
 $role = $_SESSION['role'];
 ?>
 <?php 
-if (isset($_POST['add_barang'])) {
+// Tambah Data Barang Masuk
+if (isset($_POST['add_barangmasuk'])) {
     $id_barang = $_POST['id_barang'];
-    $stok = $_POST['jumlah_stok'];
-    $id_satuan = $_POST['id_satuan'];
+    $id_kategori = $_POST['id_kategori'];
+    $id_supplier = $_POST['id_supplier'];
+    $jumlah_masuk = $_POST['jumlah_masuk'];
+    $tanggal_masuk = $_POST['tanggal_masuk'];
 
-    // Query untuk menambahkan data
-    $insertSql = "INSERT INTO tb_stok (id_barang, jumlah_stok, id_satuan) VALUES ('$id_barang', '$stok', '$id_satuan')";
+    $insertSql = "INSERT INTO tb_barangmasuk (id_barang, id_kategori, id_supplier, jumlah_masuk, tanggal_masuk) 
+                  VALUES ('$id_barang', '$id_kategori','$id_supplier', '$jumlah_masuk', '$tanggal_masuk')";
+    
     if ($config->query($insertSql)) {
-        echo "<script>alert('Data berhasil ditambahkan!'); window.location.href='stokbarang.php';</script>";
+        echo "<script>alert('Data berhasil ditambahkan!'); window.location.href='barangmasuk.php';</script>";
     } else {
         echo "<script>alert('Gagal menambahkan data: " . $config->error . "');</script>";
     }
 }
-if (isset($_POST['update_barang'])) {
-    $id_stok = $_POST['id_stok'];
-    $stok = $_POST['jumlah_stok']; // Hanya stok yang diambil untuk diperbarui
 
-    // Query untuk update stok barang
-    $updateSql = "UPDATE tb_stok SET jumlah_stok = '$stok' WHERE id_stok = '$id_stok'";
+if (isset($_POST['update_barangmasuk'])) {
+    $id_masuk = $_POST['id_masuk'];
+    $jumlah_masuk = $_POST['jumlah_masuk'];
+
+    // Query untuk update jumlah masuk barang
+    $updateSql = "UPDATE tb_barangmasuk SET jumlah_masuk = '$jumlah_masuk' WHERE id_masuk = '$id_masuk'";
+
     if ($config->query($updateSql)) {
-        echo "<script>alert('Data berhasil diupdate!'); window.location.href='stokbarang.php';</script>";
+        echo "<script>alert('Data berhasil diupdate!'); window.location.href='barangmasuk.php';</script>";
     } else {
         echo "<script>alert('Gagal mengupdate data: " . $config->error . "');</script>";
     }
 }
 
-// Hapus Data
+
+// Hapus Data Barang Masuk
 if (isset($_GET['delete'])) {
-    $id_stok = $_GET['delete'];
-    $sql = "DELETE FROM tb_stok WHERE id_stok='$id_stok'";
+    $id_masuk = $_GET['delete'];
+    $sql = "DELETE FROM tb_barangmasuk WHERE id_masuk='$id_masuk'";
+
     if ($config->query($sql)) {
-        echo "<script>alert('Data berhasil di hapus!'); window.location.href='stokbarang.php';</script>";
+        echo "<script>alert('Data berhasil dihapus!'); window.location.href='barangmasuk.php';</script>";
     } else {
         echo "<script>alert('Gagal menghapus data: " . $config->error . "');</script>";
     }
@@ -239,7 +247,7 @@ $total_pages = ceil($total_data / $limit);
             <!-- Begin Page Content -->
             <div class="container-fluid">
                 <!-- Konten Utama -->
-                <h1 class="fontuser">Data Stok Barang</h1>
+                <h1 class="fontuser">Data Barang Masuk</h1>
                 <br>
                 <div class="card shadow mb-4">
                     <!-- Isi tabel dan lainnya -->
@@ -270,8 +278,10 @@ $total_pages = ceil($total_data / $limit);
                     <tr>
                         <th>No</th>
                         <th>Nama Barang</th>
-                        <th>Stok</th>
-                        <th>Satuan</th>
+                        <th>Kategori</th>
+                        <th>Supplier</th>
+                        <th>Jumlah Masuk</th>
+                        <th>Tanggal Masuk</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -279,16 +289,20 @@ $total_pages = ceil($total_data / $limit);
                 <?php
 // Query untuk mengambil data barang dan nama kategori
 $sql = "SELECT 
-    tb_stok.id_stok, 
+    tb_barangmasuk.id_masuk, 
     tb_barang.nama_barang, 
-    tb_stok.jumlah_stok, 
-    tb_satuan.nama_satuan
+    tb_kategori.nama_kategori, 
+    tb_supplier.nama_supplier,
+    tb_barangmasuk.jumlah_masuk, 
+    tb_barangmasuk.tanggal_masuk
 FROM 
-    tb_stok
+    tb_barangmasuk
 INNER JOIN 
-    tb_barang ON tb_stok.id_barang = tb_barang.id_barang
+    tb_barang ON tb_barangmasuk.id_barang = tb_barang.id_barang
 INNER JOIN 
-    tb_satuan ON tb_stok.id_satuan = tb_satuan.id_satuan
+    tb_kategori ON tb_barang.id_kategori = tb_kategori.id_kategori
+INNER JOIN 
+    tb_supplier ON tb_barangmasuk.id_supplier = tb_supplier.id_supplier
      WHERE tb_barang.nama_barang LIKE '%$search%'
  LIMIT $offset, $limit";
 
@@ -299,14 +313,16 @@ if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         echo "<tr>
             <td>$no</td>
-            <td>{$row['nama_barang']}</td> <!-- Menampilkan Nama Barang -->
-            <td>{$row['jumlah_stok']}</td> <!-- Menampilkan Jumlah Stok -->
-            <td>{$row['nama_satuan']}</td> <!-- Menampilkan Nama Satuan -->
+            <td>{$row['nama_barang']}</td> 
+            <td>{$row['nama_kategori']}</td> 
+            <td>{$row['nama_supplier']}</td> 
+            <td>{$row['jumlah_masuk']}</td> 
+              <td>{$row['tanggal_masuk']}</td> 
             <td>
-                <button class='btn btn-transparent btn-sm' data-toggle='modal' data-target='#editDataModal{$row['id_stok']}'>
+                <button class='btn btn-transparent btn-sm' data-toggle='modal' data-target='#editDataModal{$row['id_masuk']}'>
                     <i class='fas fa-edit'></i>
                 </button>
-                <a href='?delete={$row['id_stok']}' class='btn btn-transparent btn-sm' onclick='return confirm(\"Hapus data ini?\")'>
+                <a href='?delete={$row['id_masuk']}' class='btn btn-transparent btn-sm' onclick='return confirm(\"Hapus data ini?\")'>
                     <i class='fas fa-trash-alt'></i>
                 </a>
             </td>
@@ -343,43 +359,50 @@ if ($result->num_rows > 0) {
              <!-- Modal Edit -->
          <!-- Form Modal Edit Data -->
 <?php foreach ($result as $row) : ?>
-    <div class="modal fade" id="editDataModal<?= $row['id_stok']; ?>" tabindex="-1" aria-labelledby="editDataModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <form method="POST">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editDataModalLabel">Edit Data Stok Barang</h5>
+    <div class="modal fade" id="editDataModal<?= $row['id_masuk']; ?>" tabindex="-1" aria-labelledby="editDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="POST">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDataModalLabel">Edit Data Barang Masuk</h5>
+                </div>
+                <div class="modal-body">
+                    <!-- Input hidden untuk id_masuk -->
+                    <input type="hidden" name="id_masuk" value="<?= $row['id_masuk']; ?>"> 
+
+                    <!-- Nama Barang (read-only) -->
+                    <div class="form-group">
+                        <label for="nama_barang">Nama Barang</label>
+                        <input type="text" class="form-control" id="nama_barang" name="nama_barang" value="<?= $row['nama_barang']; ?>" readonly>
                     </div>
-                    <div class="modal-body">
-                        <!-- Input hidden untuk id_stok -->
-                        <input type="hidden" name="id_stok" value="<?= $row['id_stok']; ?>"> 
 
-                        <!-- Nama Barang (read-only) -->
-                        <div class="form-group">
-                            <label for="nama_barang">Nama Barang</label>
-                            <input type="text" class="form-control" id="nama_barang" name="nama_barang" value="<?= $row['nama_barang']; ?>" readonly>
-                        </div>
-
-                        <!-- Stok Barang (editable) -->
-                        <div class="form-group">
-                            <label for="jumlah_stok">Stok</label>
-                            <input type="number" class="form-control" id="jumlah_stok" name="jumlah_stok" value="<?= $row['jumlah_stok']; ?>" required>
-                        </div>
-
-                        <!-- Satuan Barang (read-only) -->
-                        <div class="form-group">
-                            <label for="nama_satuan">Satuan</label>
-                            <input type="text" class="form-control" id="nama_satuan" name="nama_satuan" value="<?= $row['nama_satuan']; ?>" readonly>
-                        </div>
+                    <!-- Stok Masuk (editable) -->
+                    <div class="form-group">
+                        <label for="jumlah_masuk">Jumlah Masuk</label>
+                        <input type="number" class="form-control" id="jumlah_masuk" name="jumlah_masuk" value="<?= $row['jumlah_masuk']; ?>" required>
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" name="update_barang" class="btn btn-primary">Simpan Perubahan</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+
+                    <!-- Nama Supplier (read-only) -->
+                    <div class="form-group">
+                        <label for="nama_supplier">Nama Supplier</label>
+                        <input type="text" class="form-control" id="nama_supplier" name="nama_supplier" value="<?= $row['nama_supplier']; ?>" readonly>
+                    </div>
+
+                    <!-- Tanggal Masuk (read-only) -->
+                    <div class="form-group">
+                        <label for="tanggal_masuk">Tanggal Masuk</label>
+                        <input type="text" class="form-control" id="tanggal_masuk" name="tanggal_masuk" value="<?= $row['tanggal_masuk']; ?>" readonly>
                     </div>
                 </div>
-            </form>
-        </div>
+                <div class="modal-footer">
+                    <button type="submit" name="update_barangmasuk" class="btn btn-primary">Simpan Perubahan</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                </div>
+            </div>
+        </form>
     </div>
+</div>
+
 
 
 <?php endforeach; ?>
@@ -390,14 +413,15 @@ if ($result->num_rows > 0) {
         <form method="POST" enctype="multipart/form-data"> <!-- Tambahkan enctype -->
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="tambahDataModalLabel">Tambah Data</h5>
+                    <h5 class="modal-title" id="tambahDataModalLabel">Tambah Data Barang Masuk</h5>
                 </div>
                 <div class="modal-body">
-                <div class="form-group">
-                        <label for="id_kategori">Nama Barang</label>
+                    <!-- Memilih Barang -->
+                    <div class="form-group">
+                        <label for="id_barang">Nama Barang</label>
                         <select class="form-control" id="id_barang" name="id_barang" required>
                             <?php
-                            // Mengambil kategori dari tb_barang
+                            // Mengambil daftar barang dari tb_barang
                             $barangSql = "SELECT * FROM tb_barang";
                             $barangResult = $config->query($barangSql);
                             while ($barang = $barangResult->fetch_assoc()) {
@@ -406,32 +430,56 @@ if ($result->num_rows > 0) {
                             ?>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label>Stok</label>
-                        <input type="text" name="jumlah_stok" class="form-control" required placeholder="Masukan Stok">
-                    </div>
                     <div class="form-group">
-                        <label for="id_satuan">Satuan</label>
-                        <select class="form-control" id="id_satuan" name="id_satuan" required>
+                        <label for="id_kategori">Nama Kategori</label>
+                        <select class="form-control" id="id_kategori" name="id_kategori" required>
                             <?php
-                            // Mengambil kategori dari tb_kategori
-                            $satuanSql = "SELECT * FROM tb_satuan";
-                            $satuanResult = $config->query($satuanSql);
-                            while ($satuan = $satuanResult->fetch_assoc()) {
-                                echo "<option value='" . $satuan['id_satuan'] . "'>" . $satuan['nama_satuan'] . "</option>";
+                            // Mengambil daftar barang dari tb_barang
+                            $barangSql = "SELECT * FROM tb_kategori";
+                            $barangResult = $config->query($barangSql);
+                            while ($barang = $barangResult->fetch_assoc()) {
+                                echo "<option value='" . $barang['id_kategori'] . "'>" . $barang['nama_kategori'] . "</option>";
                             }
                             ?>
                         </select>
                     </div>
+
+                    <!-- Memilih Supplier -->
+                    <div class="form-group">
+                        <label for="id_supplier">Nama Supplier</label>
+                        <select class="form-control" id="id_supplier" name="id_supplier" required>
+                            <?php
+                            // Mengambil daftar supplier dari tb_supplier
+                            $supplierSql = "SELECT * FROM tb_supplier";
+                            $supplierResult = $config->query($supplierSql);
+                            while ($supplier = $supplierResult->fetch_assoc()) {
+                                echo "<option value='" . $supplier['id_supplier'] . "'>" . $supplier['nama_supplier'] . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+
+                    <!-- Input Jumlah Barang Masuk -->
+                    <div class="mb-3">
+                        <label>Jumlah Masuk</label>
+                        <input type="number" name="jumlah_masuk" class="form-control" required placeholder="Masukan Jumlah Masuk">
+                    </div>
+
+                    <!-- Input Tanggal Barang Masuk -->
+                    <div class="form-group">
+                        <label for="tanggal_masuk">Tanggal Masuk</label>
+                        <input type="date" name="tanggal_masuk" class="form-control" required>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" name="add_barang" class="btn btn-primary">Simpan</button>
+                    <button type="submit" name="add_barangmasuk" class="btn btn-primary">Simpan</button>
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
+
       
 
         <!-- Footer -->

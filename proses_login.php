@@ -18,10 +18,10 @@ if($username_exists > 0){
     if($cek > 0){
         $data = mysqli_fetch_assoc($user);
 
-        if ($data['role'] == "pimpinan"){
+        if ($data['role'] == "owner"){
             $_SESSION['username'] = $username;
             $_SESSION['role'] = "pimpinan";
-            header("location:pimpinan/pimpinan.php");
+            header("location:owner/owner.php");
             exit();
         }else if($data['role'] == "admin"){
             $_SESSION['username'] = $username;
@@ -30,8 +30,8 @@ if($username_exists > 0){
             exit();
         }else if($data['role'] == "mahasiswa"){
             $_SESSION['username'] = $username;
-            $_SESSION['role'] = "mahasiswa";
-            header("location:mahasiswa/mahasiswaa.php");
+            $_SESSION['role'] = "petugas";
+            header("location:petugas/petugas.php");
             exit();
         }
     } else {

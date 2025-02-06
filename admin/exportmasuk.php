@@ -1,0 +1,160 @@
+<?php
+// menanggil koneksi database
+include 'config.php';
+?>
+<html>
+<head>
+  <title>Barang masuk</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+</head>
+
+<body>
+<div class="container mt-4">
+    <h2> Laporan Barang masuk</h2>
+    <div class="data-tables datatable-dark">
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="tgl_mulai">Tanggal Mulai:</label>
+                        <input type="date" name="tgl_mulai" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="tgl_selesai">Tanggal Selesai:</label>
+                        <input type="date" name="tgl_selesai" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4 align-self-end">
+                    <div class="form-group">
+                        <button type="submit" name="filter_tgl" class="btn btn-sm btn-info">Filter</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Masukkan tabel di sini, dimulai dari tag TABLE -->
+        <table id="mauexport" class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Nama Barang</th>
+            <th>Kategori</th>
+            <th>Supplier</th>
+            <th>Jumlah Masuk</th>
+            <th>Tanggal Masuk</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        $no = 1;
+        if (isset($_POST['filter_tgl'])) {
+            $mulai = $_POST['tgl_mulai'];
+            $selesai = $_POST['tgl_selesai'];
+            if (!empty($mulai) && !empty($selesai)) {
+                $sql = "SELECT 
+                            tb_barangmasuk.id_masuk, 
+                            tb_barang.nama_barang, 
+                            tb_kategori.nama_kategori, 
+                            tb_supplier.nama_supplier,
+                            tb_barangmasuk.jumlah_masuk, 
+                            tb_barangmasuk.tanggal_masuk
+                        FROM 
+                            tb_barangmasuk
+                        INNER JOIN 
+                            tb_barang ON tb_barangmasuk.id_barang = tb_barang.id_barang
+                        INNER JOIN 
+                            tb_kategori ON tb_barang.id_kategori = tb_kategori.id_kategori
+                        INNER JOIN 
+                            tb_supplier ON tb_barangmasuk.id_supplier = tb_supplier.id_supplier
+                        WHERE 
+                            tb_barangmasuk.tanggal_masuk BETWEEN '$mulai' AND DATE_ADD('$selesai', INTERVAL 1 DAY)";
+            } else {
+                $sql = "SELECT 
+                            tb_barangmasuk.id_masuk, 
+                            tb_barang.nama_barang, 
+                            tb_kategori.nama_kategori, 
+                            tb_supplier.nama_supplier,
+                            tb_barangmasuk.jumlah_masuk, 
+                            tb_barangmasuk.tanggal_masuk
+                        FROM 
+                            tb_barangmasuk
+                        INNER JOIN 
+                            tb_barang ON tb_barangmasuk.id_barang = tb_barang.id_barang
+                        INNER JOIN 
+                            tb_kategori ON tb_barang.id_kategori = tb_kategori.id_kategori
+                        INNER JOIN 
+                            tb_supplier ON tb_barangmasuk.id_supplier = tb_supplier.id_supplier";
+            }
+        } else {
+            $sql = "SELECT 
+                        tb_barangmasuk.id_masuk, 
+                        tb_barang.nama_barang, 
+                        tb_kategori.nama_kategori, 
+                        tb_supplier.nama_supplier,
+                        tb_barangmasuk.jumlah_masuk, 
+                        tb_barangmasuk.tanggal_masuk
+                    FROM 
+                        tb_barangmasuk
+                    INNER JOIN 
+                        tb_barang ON tb_barangmasuk.id_barang = tb_barang.id_barang
+                    INNER JOIN 
+                        tb_kategori ON tb_barang.id_kategori = tb_kategori.id_kategori
+                    INNER JOIN 
+                        tb_supplier ON tb_barangmasuk.id_supplier = tb_supplier.id_supplier";
+        }
+
+        $query = mysqli_query($config, $sql);
+        while ($data = mysqli_fetch_array($query)) {
+            $nama_barang = $data['nama_barang'];
+            $kategori = $data['nama_kategori'];
+            $supplier = $data['nama_supplier'];
+            $jumlah_masuk = $data['jumlah_masuk'];
+            $tanggal_masuk = $data['tanggal_masuk'];
+        ?>
+        <tr>
+            <td><?php echo $no++; ?></td>
+            <td><?php echo $nama_barang; ?></td>
+            <td><?php echo $kategori; ?></td>
+            <td><?php echo $supplier; ?></td>
+            <td><?php echo $jumlah_masuk; ?></td>
+            <td><?php echo $tanggal_masuk; ?></td>
+        </tr>
+        <?php } ?>
+    </tbody>
+</table>
+
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#mauexport').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'excel', 'pdf', 'print'
+        ]
+    });
+});
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.flash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.print.min.js"></script>
+
+</body>
+</html>

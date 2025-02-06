@@ -23,9 +23,9 @@ if (isset($_POST['add_user'])) {
     // Simpan password dalam bentuk plain text (tidak di-hash)
     $sql = "INSERT INTO tb_user (username, password, role) VALUES ('$username', '$password', '$role')";
     if ($config->query($sql)) {
-        header("Location: user.php");
+        echo "<script>alert('Data berhasil ditambahkan!'); window.location.href='user.php';</script>";
     } else {
-        echo "Error: " . $config->error;
+        echo "<script>alert('Gagal menambahkan data: " . $config->error . "');</script>";
     }
 }
 // Update Data
@@ -37,9 +37,9 @@ if (isset($_POST['update_user'])) {
 
     $sql = "UPDATE tb_user SET username = '$username', password = '$password', role = '$role' WHERE id_user = '$id_user'";
     if ($config->query($sql)) {
-        header("Location: user.php");
+        echo "<script>alert('Data berhasil diperbaharui!'); window.location.href='user.php';</script>";
     } else {
-        echo "Error: " . $config->error;
+        echo "<script>alert('Gagal mengupdate data: " . $config->error . "');</script>";
     }
 }
 // Hapus Data
@@ -47,9 +47,9 @@ if (isset($_GET['delete'])) {
     $id_user = $_GET['delete'];
     $sql = "DELETE FROM tb_user WHERE id_user='$id_user'";
     if ($config->query($sql)) {
-        header("Location: user.php");
+        echo "<script>alert('Data berhasil di hapus'); window.location.href='user.php';</script>";
     } else {
-        echo "Error: " . $config->error;
+        echo "<script>alert('Gagal menghapus data: " . $config->error . "');</script>";
     }
 }
 

@@ -22,9 +22,9 @@ if (isset($_POST['add_kategori'])) {
     
     $sql = "INSERT INTO tb_kategori (nama_kategori ) VALUES ('$namakategori')";
     if ($config->query($sql)) {
-        header("Location: kategori.php");
+        echo "<script>alert('Data berhasil ditambahkan!'); window.location.href='kategori.php';</script>";
     } else {
-        echo "Error: " . $config->error;
+        echo "<script>alert('Gagal menambahkan data: " . $config->error . "');</script>";
     }
 }
 // Update Data
@@ -34,9 +34,9 @@ if (isset($_POST['update_kategori'])) {
 
     $sql = "UPDATE tb_kategori SET nama_kategori = '$namakategori' WHERE id_kategori = '$id_kategori'";
     if ($config->query($sql)) {
-        header("Location: kategori.php");
+         echo "<script>alert('Data berhasil di update!'); window.location.href='kategori.php';</script>";
     } else {
-        echo "Error: " . $config->error;
+        echo "<script>alert('Gagal mengupdate data: " . $config->error . "');</script>";
     }
 }
 // Hapus Data
@@ -44,9 +44,9 @@ if (isset($_GET['delete'])) {
     $id_kategori = $_GET['delete'];
     $sql = "DELETE FROM tb_kategori WHERE id_kategori='$id_kategori'";
     if ($config->query($sql)) {
-        header("Location: kategori.php");
+         echo "<script>alert('Data berhasil di hapus!'); window.location.href='kategori.php';</script>";
     } else {
-        echo "Error: " . $config->error;
+        echo "<script>alert('Gagal menghapus data: " . $config->error . "');</script>";
     }
 }
 
@@ -248,7 +248,7 @@ $total_pages = ceil($total_data / $limit);
             </button>
             <!-- Form Pencarian -->
             <form method="GET" class="form-inline">
-                <input type="text" name="search" class="form-control" placeholder="Cari Username" value="<?= htmlspecialchars($search); ?>">
+                <input type="text" name="search" class="form-control" placeholder="Cari Kategori" value="<?= htmlspecialchars($search); ?>">
             </form>
         </div>
         <div class="card-body">

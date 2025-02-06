@@ -23,9 +23,9 @@ if (isset($_POST['add_customer'])) {
  
     $sql = "INSERT INTO tb_customer (nama_customer,no_telepon,alamat) VALUES ('$namacustomer','$notelepon','$alamat')";
     if ($config->query($sql)) {
-        header("Location: customer.php");
+        echo "<script>alert('Data berhasil ditambahkan!'); window.location.href='kategori.php';</script>";
     } else {
-        echo "Error: " . $config->error;
+        echo "<script>alert('Gagal menambahkan data: " . $config->error . "');</script>";
     }
 }
 // Update Data
@@ -38,9 +38,9 @@ $id_customer = $_POST['id_customer'];
 
     $sql = "UPDATE tb_customer SET nama_customer = '$namacustomer',no_telepon='$notelepon',alamat ='$alamat' WHERE id_customer = '$id_customer'";
     if ($config->query($sql)) {
-        header("Location: customer.php");
+        echo "<script>alert('Data berhasil di update!'); window.location.href='customer.php';</script>";
     } else {
-        echo "Error: " . $config->error;
+        echo "<script>alert('Gagal mengupdate data: " . $config->error . "');</script>";
     }
 }
 // Hapus Data
@@ -48,9 +48,9 @@ if (isset($_GET['delete'])) {
 $id_customer = $_GET['delete'];
     $sql = "DELETE FROM tb_customer WHERE id_customer='$id_customer'";
     if ($config->query($sql)) {
-        header("Location: customer.php");
+        echo "<script>alert('Data berhasil di hapus'); window.location.href='kategori.php';</script>";
     } else {
-        echo "Error: " . $config->error;
+        echo "<script>alert('Gagal menghapus data: " . $config->error . "');</script>";
     }
 }
 
@@ -252,7 +252,7 @@ $total_pages = ceil($total_data / $limit);
             </button>
             <!-- Form Pencarian -->
             <form method="GET" class="form-inline">
-                <input type="text" name="search" class="form-control" placeholder="Cari Username" value="<?= htmlspecialchars($search); ?>">
+                <input type="text" name="search" class="form-control" placeholder="Cari Customer" value="<?= htmlspecialchars($search); ?>">
             </form>
         </div>
         <div class="card-body">
