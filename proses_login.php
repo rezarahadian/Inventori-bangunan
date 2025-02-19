@@ -20,7 +20,7 @@ if($username_exists > 0){
 
         if ($data['role'] == "owner"){
             $_SESSION['username'] = $username;
-            $_SESSION['role'] = "pimpinan";
+            $_SESSION['role'] = "owner";
             header("location:owner/owner.php");
             exit();
         }else if($data['role'] == "admin"){
@@ -28,7 +28,7 @@ if($username_exists > 0){
             $_SESSION['role'] = "admin";
             header("location:admin/admin.php");
             exit();
-        }else if($data['role'] == "mahasiswa"){
+        }else if($data['role'] == "petugas"){
             $_SESSION['username'] = $username;
             $_SESSION['role'] = "petugas";
             header("location:petugas/petugas.php");

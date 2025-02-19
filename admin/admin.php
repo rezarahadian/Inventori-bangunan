@@ -13,6 +13,54 @@ if (empty($_SESSION['username']) || empty($_SESSION['role'])) {
 // Ambil data username dan role dari sesi
 $username = $_SESSION['username']; 
 $role = $_SESSION['role'];
+
+// barang masuk
+$query = "SELECT COUNT(*) AS jumlah FROM tb_barangmasuk";
+$result = $config->query($query);
+
+// Inisialisasi nilai default jika query gagal
+$jumlah_barangmasuk = 0;
+
+// Ambil hasil query
+if ($result && $row = $result->fetch_assoc()) {
+    $jumlah_barangmasuk = $row['jumlah'];
+}
+//barang keluar
+$query = "SELECT COUNT(*) AS jumlah FROM tb_barangkeluar";
+$result = $config->query($query);
+
+// Inisialisasi nilai default jika query gagal
+$jumlah_barangkeluar = 0;
+
+// Ambil hasil query
+if ($result && $row = $result->fetch_assoc()) {
+    $jumlah_barangkeluar = $row['jumlah'];
+}
+
+//  supplier
+$query = "SELECT COUNT(*) AS jumlah FROM tb_supplier";
+$result = $config->query($query);
+
+// Inisialisasi nilai default jika query gagal
+$jumlah_supplier = 0;
+
+// Ambil hasil query
+if ($result && $row = $result->fetch_assoc()) {
+    $jumlah_supplier = $row['jumlah'];
+}
+
+// customer
+$query = "SELECT COUNT(*) AS jumlah FROM tb_customer";
+$result = $config->query($query);
+
+// Inisialisasi nilai default jika query gagal
+$jumlah_customer = 0;
+
+// Ambil hasil query
+if ($result && $row = $result->fetch_assoc()) {
+    $jumlah_customer = $row['jumlah'];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -190,22 +238,26 @@ $role = $_SESSION['role'];
             <div class="card">
               <i class="fas fa-cart-plus"></i>
               <h3>Total Barang Masuk</h3>
+              <p><?php echo $jumlah_barangmasuk; ?> Barang</p>
               <button> <a href="barangmasuk.php">Lihat Detail</a></button>
             </div>
             <div class="card">
               <i class="fas fa-cart-arrow-down"></i>
               <h3>Total Barang Keluar</h3>
+              <p><?php echo $jumlah_barangkeluar; ?> Barang</p>
               <button> <a href="barangkeluar.php">Lihat Detail</a></button>
             </div>
             <div class="card">
-              <i class="fas fa-people-arrows"></i>
+            <i class="fas fa-truck"></i>
               <h3>Total Data Supplier</h3>
+              <p><?php echo $jumlah_customer; ?> Supplier</p>
               <button> <a href="supplier.php">Lihat Detail</a></button>
             </div>
             
             <div class="card">
               <i class="fas fa-people-arrows"></i>
               <h3>Total Data Customer</h3>
+              <p><?php echo $jumlah_customer; ?> Customer</p>
               <button> <a href="customer.php">Lihat Detail</a></button>
             </div>
                         </div>

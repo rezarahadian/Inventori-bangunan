@@ -19,32 +19,82 @@ if (isset($_POST['add_barangkeluar'])) {
     $id_barang = $_POST['id_barang'];
     $id_kategori = $_POST['id_kategori'];
     $id_customer = $_POST['id_customer'];
-    $jumlah_keluar = $_POST['jumlah_keluar'];
+    $jumlah_keluar = (int) $_POST['jumlah_keluar']; // Pastikan ini integer
     $tanggal_keluar = $_POST['tanggal_keluar'];
 
-    $insertSql = "INSERT INTO tb_barangkeluar (id_barang, id_kategori, id_customer, jumlah_keluar, tanggal_keluar) 
-                  VALUES ('$id_barang', '$id_kategori','$id_customer', '$jumlah_keluar', '$tanggal_keluar')";
+    // Ambil jumlah stok saat ini
+    $stokSql = "SELECT jumlah_stok FROM tb_stok WHERE id_barang = '$id_barang'";
+    $stokResult = $config->query($stokSql);
     
-    if ($config->query($insertSql)) {
-        echo "<script>alert('Data berhasil ditambahkan!'); window.location.href='barangkeluar.php';</script>";
+    if ($stokResult->num_rows > 0) {
+        $stokRow = $stokResult->fetch_assoc();
+        $stokTersedia = (int) $stokRow['jumlah_stok'];
+
+        // Tetapkan batas stok minimal
+        $stokMinimal = 5;
+        $stokBaru = $stokTersedia - $jumlah_keluar;
+
+        if ($jumlah_keluar > $stokTersedia) {
+            echo "<script>alert('Tidak bisa menambah barang keluar karena melebihi stok yang ada!'); window.location.href='barangkeluar.php';</script>";
+        } elseif ($stokBaru < $stokMinimal) {
+            echo "<script>alert('Stok tidak mencukupi! Minimal stok harus tersisa $stokMinimal.'); window.location.href='barangkeluar.php';</script>";
+        } else {
+            // Jika stok cukup, baru lakukan insert ke tb_barangkeluar
+            $insertSql = "INSERT INTO tb_barangkeluar (id_barang, id_kategori, id_customer, jumlah_keluar, tanggal_keluar) 
+                          VALUES ('$id_barang', '$id_kategori','$id_customer', '$jumlah_keluar', '$tanggal_keluar')";
+
+            if ($config->query($insertSql)) {
+                // Update stok di tb_stok setelah barang keluar
+                $updateStokSql = "UPDATE tb_stok SET jumlah_stok = $stokBaru WHERE id_barang = '$id_barang'";
+                $config->query($updateStokSql);
+
+                echo "<script>alert('Data berhasil ditambahkan!'); window.location.href='barangkeluar.php';</script>";
+            } else {
+                echo "<script>alert('Gagal menambahkan data: " . $config->error . "');</script>";
+            }
+        }
     } else {
-        echo "<script>alert('Gagal menambahkan data: " . $config->error . "');</script>";
+        echo "<script>alert('Barang tidak ditemukan dalam stok!'); window.location.href='barangkeluar.php';</script>";
     }
 }
+
 
 if (isset($_POST['update_barangkeluar'])) {
     $id_keluar = $_POST['id_keluar'];
     $jumlah_keluar = $_POST['jumlah_keluar'];
 
-    // Query untuk update jumlah masuk barang
-    $updateSql = "UPDATE tb_barangkeluar SET jumlah_keluar = '$jumlah_keluar' WHERE id_keluar = '$id_keluar'";
+    // Dapatkan jumlah barang keluar sebelumnya
+    $getOldSql = "SELECT id_barang, jumlah_keluar FROM tb_barangkeluar WHERE id_keluar = '$id_keluar'";
+    $oldResult = $config->query($getOldSql);
+    $oldRow = $oldResult->fetch_assoc();
+    $id_barang = $oldRow['id_barang'];
+    $jumlah_keluar_lama = $oldRow['jumlah_keluar'];
 
-    if ($config->query($updateSql)) {
-        echo "<script>alert('Data berhasil diupdate!'); window.location.href='barangkeluar.php';</script>";
+    // Hitung stok terbaru jika barang keluar diperbarui
+    $stokSql = "SELECT jumlah_stok FROM tb_stok WHERE id_barang = '$id_barang'";
+    $stokResult = $config->query($stokSql);
+    $stokRow = $stokResult->fetch_assoc();
+    $stokTersedia = $stokRow['jumlah_stok'] + $jumlah_keluar_lama; // Kembalikan stok lama dulu sebelum update
+
+    if ($jumlah_keluar > $stokTersedia) {
+        echo "<script>alert('Tidak bisa mengupdate barang keluar karena melebihi stok yang ada!'); window.location.href='barangkeluar.php';</script>";
     } else {
-        echo "<script>alert('Gagal mengupdate data: " . $config->error . "');</script>";
+        // Update jumlah barang keluar
+        $updateSql = "UPDATE tb_barangkeluar SET jumlah_keluar = '$jumlah_keluar' WHERE id_keluar = '$id_keluar'";
+
+        if ($config->query($updateSql)) {
+            // Update stok di tb_stok setelah perubahan jumlah barang keluar
+            $newStok = $stokTersedia - $jumlah_keluar;
+            $updateStokSql = "UPDATE tb_stok SET jumlah_stok = '$newStok' WHERE id_barang = '$id_barang'";
+            $config->query($updateStokSql);
+
+            echo "<script>alert('Data berhasil diupdate!'); window.location.href='barangkeluar.php';</script>";
+        } else {
+            echo "<script>alert('Gagal mengupdate data: " . $config->error . "');</script>";
+        }
     }
 }
+
 
 
 // Hapus Data Barang Masuk
@@ -71,18 +121,24 @@ if (isset($_GET['id_barang'])) {
 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $page = max($page, 1); // Pastikan page minimal 1
-$offset = ($page - 1) * $limit;
+
 // Fitur Pencarian
 $search = isset($_GET['search']) ? mysqli_real_escape_string($config, $_GET['search']) : '';
-// Query untuk mendapatkan data dengan pagination dan pencarian
-$query = "SELECT * FROM tb_barang WHERE nama_barang LIKE '%$search%' LIMIT $limit OFFSET $offset";
-$result = mysqli_query($config, $query);
+
 // Query untuk menghitung jumlah total data dengan pencarian
 $query_count = "SELECT COUNT(*) AS total FROM tb_barang WHERE nama_barang LIKE '%$search%'";
 $count_result = mysqli_query($config, $query_count);
 $total_data = mysqli_fetch_assoc($count_result)['total'];
+
 // Menghitung jumlah total halaman
-$total_pages = ceil($total_data / $limit);
+$total_pages = max(ceil($total_data / $limit), 1);
+$page = min($page, $total_pages); // Pastikan page tidak melebihi total_pages
+
+$offset = ($page - 1) * $limit;
+
+// Query untuk mendapatkan data dengan pagination dan pencarian
+$query = "SELECT * FROM tb_barang WHERE nama_barang LIKE '%$search%' LIMIT $limit OFFSET $offset";
+$result = mysqli_query($config, $query);
 
 ?>
 <!DOCTYPE html>
@@ -102,7 +158,7 @@ $total_pages = ceil($total_data / $limit);
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+    <link href="custom.css" rel="stylesheet">
 </head>
 <body id="page-top">
    <!-- Wrapper untuk seluruh halaman -->
@@ -142,7 +198,7 @@ $total_pages = ceil($total_data / $limit);
                             <a class="collapse-item" href="satuan.php">Satuan</a>
                             <a class="collapse-item" href="kategori.php">Kategori</a>
                             <a class="collapse-item" href="stokbarang.php">Stok Barang</a>
-                            <a class="collapse-item" href="barangkeluar.php">Barang Masuk</a>
+                            <a class="collapse-item" href="barangmasuk.php">Barang Masuk</a>
                             <a class="collapse-item" href="barangkeluar.php">Barang Keluar</a>
                         </div>
                     </div>
@@ -167,9 +223,9 @@ $total_pages = ceil($total_data / $limit);
                     <div id="collapseLaporan" class="collapse" aria-labelledby="headingLaporan" data-parent="#accordionSidebar">
                         <div class="bg-white py-2 collapse-inner rounded">
                             <h6 class="collapse-header">Laporan:</h6>
-                            <a class="collapse-item" href="stokbarang.php">Laporan Stok Barang</a>
-                            <a class="collapse-item" href="barangkeluar.php">Laporan Barang Masuk</a>
-                            <a class="collapse-item" href="barangkeluar.php">Laporan Barang Keluar</a>
+                            <a class="collapse-item" href="laporanstok.php">Laporan Stok Barang</a>
+                            <a class="collapse-item" href="laporanmasuk.php">Laporan Barang Masuk</a>
+                            <a class="collapse-item" href="laporankeluar.php">Laporan Barang Keluar</a>
                         </div>
                     </div>
                 </li>
@@ -341,18 +397,23 @@ if ($result->num_rows > 0) {
 
             <!-- Pagination -->
             <ul class="pagination">
-                <li class="page-item <?= $page <= 1 ? 'disabled' : ''; ?>">
-                    <a class="page-link" href="?page=<?= $page - 1; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Previous</a>
-                </li>
-                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                    <li class="page-item <?= $i == $page ? 'active' : ''; ?>">
-                        <a class="page-link" href="?page=<?= $i; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>"><?= $i; ?></a>
-                    </li>
-                <?php endfor; ?>
-                <li class="page-item <?= $page >= $total_pages ? 'disabled' : ''; ?>">
-                    <a class="page-link" href="?page=<?= $page + 1; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Next</a>
-                </li>
-            </ul>
+    <!-- Tombol Previous -->
+    <li class="page-item <?= ($page <= 1) ? 'disabled' : ''; ?>">
+        <a class="page-link" href="?page=<?= max($page - 1, 1); ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Previous</a>
+    </li>
+
+    <!-- Nomor Halaman -->
+    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+        <li class="page-item <?= ($i == $page) ? 'active' : ''; ?>">
+            <a class="page-link" href="?page=<?= $i; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>"><?= $i; ?></a>
+        </li>
+    <?php endfor; ?>
+
+    <!-- Tombol Next -->
+    <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : ''; ?>">
+        <a class="page-link" href="?page=<?= min($page + 1, $total_pages); ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Next</a>
+    </li>
+</ul>
        
              </div><!-- End of Page Content -->
         </div><!-- End of Main Content -->

@@ -98,7 +98,7 @@ $total_pages = ceil($total_data / $limit);
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+    <link href="custom.css" rel="stylesheet">
 </head>
 <body id="page-top">
    <!-- Wrapper untuk seluruh halaman -->
@@ -110,7 +110,7 @@ $total_pages = ceil($total_data / $limit);
                 <div class="sidebar-brand-icon rotate-n-1">
                 <i class="fas fa-university"></i>
                 </div>
-                <div class="sidebar-brand-text mx-1"> REZA JAYA BANGUNAN </div>
+                <div class="sidebar-brand-text mx-1 fo"> REZA JAYA BANGUNAN </div>
             </a>
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
@@ -163,9 +163,9 @@ $total_pages = ceil($total_data / $limit);
                     <div id="collapseLaporan" class="collapse" aria-labelledby="headingLaporan" data-parent="#accordionSidebar">
                         <div class="bg-white py-2 collapse-inner rounded">
                             <h6 class="collapse-header">Laporan:</h6>
-                            <a class="collapse-item" href="stokbarang.php">Laporan Stok Barang</a>
-                            <a class="collapse-item" href="barangmasuk.php">Laporan Barang Masuk</a>
-                            <a class="collapse-item" href="barangkeluar.php">Laporan Barang Keluar</a>
+                            <a class="collapse-item" href="laporanstok.php">Laporan Stok Barang</a>
+                            <a class="collapse-item" href="laporanmasuk.php">Laporan Barang Masuk</a>
+                            <a class="collapse-item" href="laporankeluar.php">Laporan Barang Keluar</a>
                         </div>
                     </div>
                 </li>
@@ -346,9 +346,9 @@ $total_pages = ceil($total_data / $limit);
                             <input type="text" id="role" name="role" class="form-control" list="role-options"
                                 value="<?= $row['role']; ?>" placeholder="Pilih role">
                             <datalist id="role-options">
+                                <option value="owner"></option>
                                 <option value="admin"></option>
-                                <option value="pimpinan"></option>
-                                <option value="mahasiswa"></option>
+                                <option value="petugas"></option>
                             </datalist>
                         </div>
                     </div>
@@ -383,9 +383,9 @@ $total_pages = ceil($total_data / $limit);
                         <input type="text" id="role" name="role" class="form-control" list="role-options" 
                         value="<?php echo isset($row['role']) ? $row['role'] : ''; ?>" placeholder="Pilih role">
                         <datalist id="role-options">
+                            <option value="owner"></option>
                             <option value="admin"></option>
-                            <option value="pimpinan"></option>
-                            <option value="mahasiswa"></option>
+                            <option value="petugas"></option>
                         </datalist>
                     </div>
                     </div>
@@ -443,5 +443,10 @@ $total_pages = ceil($total_data / $limit);
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
+    <script>document.getElementById("sidebarToggle").addEventListener("click", function () {
+    document.querySelector(".sidebar").classList.toggle("collapsed");
+    document.getElementById("content-wrapper").classList.toggle("collapsed");
+});
+</script>
 </body>
 </html>

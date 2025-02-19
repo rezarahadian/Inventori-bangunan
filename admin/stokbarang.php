@@ -14,19 +14,7 @@ $username = $_SESSION['username'];
 $role = $_SESSION['role'];
 ?>
 <?php 
-if (isset($_POST['add_barang'])) {
-    $id_barang = $_POST['id_barang'];
-    $stok = $_POST['jumlah_stok'];
-    $id_satuan = $_POST['id_satuan'];
 
-    // Query untuk menambahkan data
-    $insertSql = "INSERT INTO tb_stok (id_barang, jumlah_stok, id_satuan) VALUES ('$id_barang', '$stok', '$id_satuan')";
-    if ($config->query($insertSql)) {
-        echo "<script>alert('Data berhasil ditambahkan!'); window.location.href='stokbarang.php';</script>";
-    } else {
-        echo "<script>alert('Gagal menambahkan data: " . $config->error . "');</script>";
-    }
-}
 if (isset($_POST['update_barang'])) {
     $id_stok = $_POST['id_stok'];
     $stok = $_POST['jumlah_stok']; // Hanya stok yang diambil untuk diperbarui
@@ -94,7 +82,7 @@ $total_pages = ceil($total_data / $limit);
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+    <link href="custom.css" rel="stylesheet">
 </head>
 <body id="page-top">
    <!-- Wrapper untuk seluruh halaman -->
@@ -159,9 +147,9 @@ $total_pages = ceil($total_data / $limit);
                     <div id="collapseLaporan" class="collapse" aria-labelledby="headingLaporan" data-parent="#accordionSidebar">
                         <div class="bg-white py-2 collapse-inner rounded">
                             <h6 class="collapse-header">Laporan:</h6>
-                            <a class="collapse-item" href="stokbarang.php">Laporan Stok Barang</a>
-                            <a class="collapse-item" href="barangmasuk.php">Laporan Barang Masuk</a>
-                            <a class="collapse-item" href="barangkeluar.php">Laporan Barang Keluar</a>
+                            <a class="collapse-item" href="laporanstok.php">Laporan Stok Barang</a>
+                            <a class="collapse-item" href="laporanmasuk.php">Laporan Barang Masuk</a>
+                            <a class="collapse-item" href="laporankeluar.php">Laporan Barang Keluar</a>
                         </div>
                     </div>
                 </li>
@@ -244,9 +232,7 @@ $total_pages = ceil($total_data / $limit);
                 <div class="card shadow mb-4">
                     <!-- Isi tabel dan lainnya -->
                     <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <button type="button" class="button" data-toggle="modal" data-target="#tambahDataModal">
-                Tambah Data
-            </button>
+                    
             <!-- Form Pencarian -->
             <form method="GET" class="form-inline">
                 <input type="text" name="search" class="form-control" placeholder="Cari Barang" value="<?= htmlspecialchars($search); ?>">
@@ -384,54 +370,6 @@ if ($result->num_rows > 0) {
 
 <?php endforeach; ?>
 
-    <!-- Modal Tambah -->
-    <div class="modal fade" id="tambahDataModal" tabindex="-1" aria-labelledby="tambahDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form method="POST" enctype="multipart/form-data"> <!-- Tambahkan enctype -->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="tambahDataModalLabel">Tambah Data</h5>
-                </div>
-                <div class="modal-body">
-                <div class="form-group">
-                        <label for="id_kategori">Nama Barang</label>
-                        <select class="form-control" id="id_barang" name="id_barang" required>
-                            <?php
-                            // Mengambil kategori dari tb_barang
-                            $barangSql = "SELECT * FROM tb_barang";
-                            $barangResult = $config->query($barangSql);
-                            while ($barang = $barangResult->fetch_assoc()) {
-                                echo "<option value='" . $barang['id_barang'] . "'>" . $barang['nama_barang'] . "</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label>Stok</label>
-                        <input type="text" name="jumlah_stok" class="form-control" required placeholder="Masukan Stok">
-                    </div>
-                    <div class="form-group">
-                        <label for="id_satuan">Satuan</label>
-                        <select class="form-control" id="id_satuan" name="id_satuan" required>
-                            <?php
-                            // Mengambil kategori dari tb_kategori
-                            $satuanSql = "SELECT * FROM tb_satuan";
-                            $satuanResult = $config->query($satuanSql);
-                            while ($satuan = $satuanResult->fetch_assoc()) {
-                                echo "<option value='" . $satuan['id_satuan'] . "'>" . $satuan['nama_satuan'] . "</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" name="add_barang" class="btn btn-primary">Simpan</button>
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
       
 
         <!-- Footer -->

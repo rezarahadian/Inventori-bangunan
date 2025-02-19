@@ -17,29 +17,48 @@ $role = $_SESSION['role'];
 if (isset($_POST['add_barang'])) {
     $nama_barang = $_POST['nama_barang'];
     $id_kategori = $_POST['id_kategori'];
-    $foto = $_FILES['foto']['name']; // Nama file
-    $tmpFile = $_FILES['foto']['tmp_name']; // Lokasi sementara file
-    $targetDir = "image/"; // Folder tujuan
-    $targetFile = $targetDir . basename($foto); // Path lengkap file
+    $id_satuan = $_POST['id_satuan'];
+    $foto = $_FILES['foto']['name'];
+    $tmpFile = $_FILES['foto']['tmp_name'];
+    $targetDir = "image/";
+    $targetFile = $targetDir . basename($foto);
 
-    // Proses upload file
     if (move_uploaded_file($tmpFile, $targetFile)) {
-        // Jika upload berhasil, simpan data ke database
-        $sql = "INSERT INTO tb_barang (nama_barang, foto, id_kategori) VALUES ('$nama_barang', '$foto', '$id_kategori')";
+        // Simpan barang ke tb_barang
+        $sql = "INSERT INTO tb_barang (nama_barang, foto, id_kategori, id_satuan) 
+                VALUES ('$nama_barang', '$foto', '$id_kategori', '$id_satuan')";
+        
         if ($config->query($sql)) {
+            $last_id = $config->insert_id;
+
+            // Cek apakah stok sudah ada sebelumnya
+            $cekStok = "SELECT COUNT(*) AS total FROM tb_stok WHERE id_barang = '$last_id'";
+            $resultStok = $config->query($cekStok);
+            $row = $resultStok->fetch_assoc();
+
+            if ($row['total'] == 0) {
+                // Jika stok belum ada, tambahkan ke tb_stok
+                $sql_stok = "INSERT INTO tb_stok (id_barang, jumlah_stok, id_satuan) 
+                            VALUES ('$last_id', 0, '$id_satuan')";
+                $config->query($sql_stok);
+            }
+
             echo "<script>alert('Data berhasil ditambahkan!'); window.location.href='barang.php';</script>";
         } else {
-             echo "<script>alert('Gagal menambahkan data: " . $config->error . "');</script>";
+            echo "<script>alert('Gagal menambahkan data: " . $config->error . "');</script>";
         }
     } else {
         echo "Gagal mengupload foto.";
     }
 }
+
+
 // Update data barang
 if (isset($_POST['update_barang'])) {
     $id_barang = $_POST['id_barang'];
     $nama_barang = $_POST['nama_barang'];
     $id_kategori = $_POST['id_kategori'];
+    $id_satuan = $_POST['id_satuan']; // Ambil id_satuan dari form
     $foto = $_FILES['foto']['name']; // Nama file baru jika ada
     $tmpFile = $_FILES['foto']['tmp_name']; // Lokasi sementara file
 
@@ -52,7 +71,7 @@ if (isset($_POST['update_barang'])) {
         if (move_uploaded_file($tmpFile, $targetFile)) {
             // Update dengan foto baru
             $sql = "UPDATE tb_barang 
-                    SET nama_barang = '$nama_barang', foto = '$foto', id_kategori = '$id_kategori' 
+                    SET nama_barang = '$nama_barang', foto = '$foto', id_kategori = '$id_kategori', id_satuan = '$id_satuan' 
                     WHERE id_barang = '$id_barang'";
         } else {
             echo "Gagal mengupload foto.";
@@ -61,16 +80,21 @@ if (isset($_POST['update_barang'])) {
     } else {
         // Update tanpa mengubah foto
         $sql = "UPDATE tb_barang 
-                SET nama_barang = '$nama_barang', id_kategori = '$id_kategori' 
+                SET nama_barang = '$nama_barang', id_kategori = '$id_kategori', id_satuan = '$id_satuan'
                 WHERE id_barang = '$id_barang'";
     }
 
     if ($config->query($sql)) {
-         echo "<script>alert('Data berhasil di update!'); window.location.href='barang.php';</script>";
+        // Pastikan stok juga update satuannya jika id_satuan berubah
+        $sql_stok = "UPDATE tb_stok SET id_satuan = '$id_satuan' WHERE id_barang = '$id_barang'";
+        $config->query($sql_stok);
+
+        echo "<script>alert('Data berhasil diupdate!'); window.location.href='barang.php';</script>";
     } else {
-         echo "<script>alert('Gagal mengupdate data: " . $config->error . "');</script>";
+        echo "<script>alert('Gagal mengupdate data: " . $config->error . "');</script>";
     }
 }
+
 
 // Hapus Data
 if (isset($_GET['delete'])) {
@@ -126,7 +150,7 @@ $total_pages = ceil($total_data / $limit);
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+    <link href="custom.css" rel="stylesheet">
 </head>
 <body id="page-top">
    <!-- Wrapper untuk seluruh halaman -->
@@ -191,9 +215,9 @@ $total_pages = ceil($total_data / $limit);
                     <div id="collapseLaporan" class="collapse" aria-labelledby="headingLaporan" data-parent="#accordionSidebar">
                         <div class="bg-white py-2 collapse-inner rounded">
                             <h6 class="collapse-header">Laporan:</h6>
-                            <a class="collapse-item" href="stokbarang.php">Laporan Stok Barang</a>
-                            <a class="collapse-item" href="barangmasuk.php">Laporan Barang Masuk</a>
-                            <a class="collapse-item" href="barangkeluar.php">Laporan Barang Keluar</a>
+                            <a class="collapse-item" href="laporanstok.php">Laporan Stok Barang</a>
+                            <a class="collapse-item" href="laporanmasuk.php">Laporan Barang Masuk</a>
+                            <a class="collapse-item" href="laporankeluar.php">Laporan Barang Keluar</a>
                         </div>
                     </div>
                 </li>
@@ -304,17 +328,23 @@ $total_pages = ceil($total_data / $limit);
                         <th>Nama Barang</th>
                         <th>Foto</th>
                         <th>Kategori</th>
+                        <th>Satuan</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                 <?php
 // Query untuk mengambil data barang dan nama kategori
-$sql = "SELECT tb_barang.id_barang, tb_barang.nama_barang, tb_barang.foto, tb_kategori.nama_kategori 
-        FROM tb_barang 
-        INNER JOIN tb_kategori ON tb_barang.id_kategori = tb_kategori.id_kategori 
-        WHERE tb_barang.nama_barang LIKE '%$search%'
-        LIMIT $offset, $limit";
+$sql = "SELECT tb_barang.id_barang, 
+       tb_barang.nama_barang, 
+       tb_barang.foto, 
+       tb_kategori.nama_kategori,
+       tb_satuan.nama_satuan
+FROM tb_barang
+INNER JOIN tb_kategori ON tb_barang.id_kategori = tb_kategori.id_kategori
+INNER JOIN tb_satuan ON tb_barang.id_satuan = tb_satuan.id_satuan
+WHERE tb_barang.nama_barang LIKE '%$search%'
+LIMIT $offset, $limit;";
 
 $result = $config->query($sql);
 
@@ -324,8 +354,9 @@ if ($result->num_rows > 0) {
         echo "<tr>
             <td>$no</td>
             <td>{$row['nama_barang']}</td>
-            <td><img src='image/{$row['foto']}' alt='{$row['nama_barang']}' style='width: 50px; height: 50px;'></td>
+            <td><img src='image/{$row['foto']}' alt='{$row['nama_barang']}' style='width: 75px; height: 60px;'></td>
             <td>{$row['nama_kategori']}</td>
+             <td>{$row['nama_satuan']}</td>
              <td>
     <button class='btn btn-transparent btn-sm' data-toggle='modal' data-target='#editDataModal{$row['id_barang']}'>
         <i class='fas fa-edit'></i>
@@ -396,6 +427,19 @@ if ($result->num_rows > 0) {
                                 ?>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label for="id_satuan">Satuan Barang</label>
+                            <select class="form-control" id="id_satuan" name="id_satuan" required>
+                                <?php
+                                $satuanSql = "SELECT * FROM tb_satuan";
+                                $satuanResult = $config->query($satuanSql);
+                                while ($satuan = $satuanResult->fetch_assoc()) {
+                                    $selected = ($satuan['id_satuan'] == $row['id_satuan']) ? 'selected' : '';
+                                    echo "<option value='" . $satuan['id_satuan'] . "' $selected>" . $satuan['nama_satuan'] . "</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" name="update_barang" class="btn btn-primary">Simpan</button>
@@ -437,6 +481,19 @@ if ($result->num_rows > 0) {
                             ?>
                         </select>
                     </div>
+                    <div class="form-group">
+                            <label for="id_satuan">Satuan Barang</label>
+                            <select class="form-control" id="id_satuan" name="id_satuan" required>
+                                <?php
+                                $satuanSql = "SELECT * FROM tb_satuan";
+                                $satuanResult = $config->query($satuanSql);
+                                while ($satuan = $satuanResult->fetch_assoc()) {
+                                    $selected = ($satuan['id_satuan'] == $row['id_satuan']) ? 'selected' : '';
+                                    echo "<option value='" . $satuan['id_satuan'] . "' $selected>" . $satuan['nama_satuan'] . "</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" name="add_barang" class="btn btn-primary">Simpan</button>

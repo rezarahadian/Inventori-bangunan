@@ -49,7 +49,7 @@ $total_pages = ceil($total_data / $limit);
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+    <link href="custom.css" rel="stylesheet">
 </head>
 <body id="page-top">
    <!-- Wrapper untuk seluruh halaman -->
@@ -114,9 +114,9 @@ $total_pages = ceil($total_data / $limit);
                     <div id="collapseLaporan" class="collapse" aria-labelledby="headingLaporan" data-parent="#accordionSidebar">
                         <div class="bg-white py-2 collapse-inner rounded">
                             <h6 class="collapse-header">Laporan:</h6>
-                            <a class="collapse-item" href="laporanbarang.php">Laporan Stok Barang</a>
+                            <a class="collapse-item" href="laporanstok.php">Laporan Stok Barang</a>
                             <a class="collapse-item" href="laporanmasuk.php">Laporan Barang Masuk</a>
-                            <a class="collapse-item" href="laporanmasuk.php">Laplaporan Keluar</a>
+                            <a class="collapse-item" href="laporankeluar.php">Laporan Barang Keluar</a>
                         </div>
                     </div>
                 </li>
@@ -222,13 +222,7 @@ $total_pages = ceil($total_data / $limit);
         <input type="hidden" name="search" value="<?= htmlspecialchars($search); ?>">
         <input type="hidden" name="page" value="1">
     </form>
-    <form method="POST" class="form-inline mb-3 d-flex align-items-center">
-        <label for="tgl_mulai" class="mr-2">Tanggal Mulai:</label>
-        <input type="date" name="tgl_mulai" class="form-control mr-2">
-        <label for="tgl_selesai" class="mr-2">Tanggal Selesai:</label>
-        <input type="date" name="tgl_selesai" class="form-control mr-2">
-        <button type="submit" name="filter_tgl" class="btn btn-info btn-sm mr-3">Filter</button>
-    </form>
+   
 </div>
 
                         
@@ -248,13 +242,7 @@ $total_pages = ceil($total_data / $limit);
                             // Query untuk mengambil data barang dan nama kategori dengan filter tanggal
                             $where = " WHERE tb_barang.nama_barang LIKE '%$search%'";
                             
-                            if (isset($_POST['filter_tgl'])) {
-                                $tgl_mulai = $_POST['tgl_mulai'];
-                                $tgl_selesai = $_POST['tgl_selesai'];
-                                if (!empty($tgl_mulai) && !empty($tgl_selesai)) {
-                                    $where .= " AND tb_barangmasuk.tanggal_masuk BETWEEN '$tgl_mulai' AND '$tgl_selesai'";
-                                }
-                            }
+
                             
                             $sql = "SELECT 
                                 tb_barangmasuk.id_masuk, 

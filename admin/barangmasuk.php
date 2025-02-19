@@ -71,18 +71,24 @@ if (isset($_GET['id_barang'])) {
 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $page = max($page, 1); // Pastikan page minimal 1
-$offset = ($page - 1) * $limit;
+
 // Fitur Pencarian
 $search = isset($_GET['search']) ? mysqli_real_escape_string($config, $_GET['search']) : '';
-// Query untuk mendapatkan data dengan pagination dan pencarian
-$query = "SELECT * FROM tb_barang WHERE nama_barang LIKE '%$search%' LIMIT $limit OFFSET $offset";
-$result = mysqli_query($config, $query);
+
 // Query untuk menghitung jumlah total data dengan pencarian
 $query_count = "SELECT COUNT(*) AS total FROM tb_barang WHERE nama_barang LIKE '%$search%'";
 $count_result = mysqli_query($config, $query_count);
 $total_data = mysqli_fetch_assoc($count_result)['total'];
+
 // Menghitung jumlah total halaman
-$total_pages = ceil($total_data / $limit);
+$total_pages = max(ceil($total_data / $limit), 1);
+$page = min($page, $total_pages); // Pastikan page tidak melebihi total_pages
+
+$offset = ($page - 1) * $limit;
+
+// Query untuk mendapatkan data dengan pagination dan pencarian
+$query = "SELECT * FROM tb_barang WHERE nama_barang LIKE '%$search%' LIMIT $limit OFFSET $offset";
+$result = mysqli_query($config, $query);
 
 ?>
 <!DOCTYPE html>
@@ -102,7 +108,7 @@ $total_pages = ceil($total_data / $limit);
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+    <link href="custom.css" rel="stylesheet">
 </head>
 <body id="page-top">
    <!-- Wrapper untuk seluruh halaman -->
@@ -167,9 +173,9 @@ $total_pages = ceil($total_data / $limit);
                     <div id="collapseLaporan" class="collapse" aria-labelledby="headingLaporan" data-parent="#accordionSidebar">
                         <div class="bg-white py-2 collapse-inner rounded">
                             <h6 class="collapse-header">Laporan:</h6>
-                            <a class="collapse-item" href="stokbarang.php">Laporan Stok Barang</a>
-                            <a class="collapse-item" href="barangmasuk.php">Laporan Barang Masuk</a>
-                            <a class="collapse-item" href="barangkeluar.php">Laporan Barang Keluar</a>
+                            <a class="collapse-item" href="laporanstok.php">Laporan Stok Barang</a>
+                            <a class="collapse-item" href="laporanmasuk.php">Laporan Barang Masuk</a>
+                            <a class="collapse-item" href="laporankeluar.php">Laporan Barang Keluar</a>
                         </div>
                     </div>
                 </li>
@@ -340,19 +346,24 @@ if ($result->num_rows > 0) {
             </table>
 
             <!-- Pagination -->
-            <ul class="pagination">
-                <li class="page-item <?= $page <= 1 ? 'disabled' : ''; ?>">
-                    <a class="page-link" href="?page=<?= $page - 1; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Previous</a>
-                </li>
-                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                    <li class="page-item <?= $i == $page ? 'active' : ''; ?>">
-                        <a class="page-link" href="?page=<?= $i; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>"><?= $i; ?></a>
-                    </li>
-                <?php endfor; ?>
-                <li class="page-item <?= $page >= $total_pages ? 'disabled' : ''; ?>">
-                    <a class="page-link" href="?page=<?= $page + 1; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Next</a>
-                </li>
-            </ul>
+           <ul class="pagination">
+    <!-- Tombol Previous -->
+    <li class="page-item <?= ($page <= 1) ? 'disabled' : ''; ?>">
+        <a class="page-link" href="?page=<?= max($page - 1, 1); ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Previous</a>
+    </li>
+
+    <!-- Nomor Halaman -->
+    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+        <li class="page-item <?= ($i == $page) ? 'active' : ''; ?>">
+            <a class="page-link" href="?page=<?= $i; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>"><?= $i; ?></a>
+        </li>
+    <?php endfor; ?>
+
+    <!-- Tombol Next -->
+    <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : ''; ?>">
+        <a class="page-link" href="?page=<?= min($page + 1, $total_pages); ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Next</a>
+    </li>
+</ul>
        
              </div><!-- End of Page Content -->
         </div><!-- End of Main Content -->
