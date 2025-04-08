@@ -15,21 +15,26 @@ $role = $_SESSION['role'];
 ?>
 <?php
 // Tentukan jumlah data per halaman (default: 5 data per halaman)
-$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5;
+$limit = isset($_GET['limit']) ? ($_GET['limit'] == 'all' ? 'all' : (int)$_GET['limit']) : 5;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $page = max($page, 1); // Pastikan page minimal 1
-$offset = ($page - 1) * $limit;
+$offset = ($page - 1) * ($limit === 'all' ? 0 : $limit);
+
 // Fitur Pencarian
 $search = isset($_GET['search']) ? mysqli_real_escape_string($config, $_GET['search']) : '';
+
 // Query untuk mendapatkan data dengan pagination dan pencarian
-$query = "SELECT * FROM tb_barang WHERE nama_barang LIKE '%$search%' LIMIT $limit OFFSET $offset";
+$query = "SELECT * FROM tb_barang WHERE nama_barang LIKE '%$search%'";
+if ($limit !== 'all') {
+    $query .= " LIMIT $limit OFFSET $offset";
+}
 $result = mysqli_query($config, $query);
-// Query untuk menghitung jumlah total data dengan pencarian
-$query_count = "SELECT COUNT(*) AS total FROM tb_barang WHERE nama_barang LIKE '%$search%'";
+
+// Query untuk menghitung jumlah total data dari tabel tb_barangkeluar dengan pencarian
+$query_count = "SELECT COUNT(*) AS total FROM tb_barangkeluar WHERE id_barang LIKE '%$search%'";
 $count_result = mysqli_query($config, $query_count);
 $total_data = mysqli_fetch_assoc($count_result)['total'];
-// Menghitung jumlah total halaman
-$total_pages = ceil($total_data / $limit);
+$total_pages = $limit === 'all' ? 1 : ceil($total_data / $limit);
 
 ?>
 <!DOCTYPE html>
@@ -84,14 +89,11 @@ $total_pages = ceil($total_data / $limit);
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Data Barang:</h6>
                         <a class="collapse-item" href="stokbarang.php">Stok Barang</a>
-                        <a class="collapse-item" href="barangmasuk.php">Barang Masuk</a>
+                        <a class="collapse-item" href="barangkeluar.php">Barang Masuk</a>
                         <a class="collapse-item" href="barangkeluar.php">Barang Keluar</a>
                     </div>
                 </div>
             </li>
-
-
-
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLaporan"
                     aria-expanded="true" aria-controls="collapseLaporan">
@@ -106,6 +108,11 @@ $total_pages = ceil($total_data / $limit);
                         <a class="collapse-item" href="laporankeluar.php">Laporan Barang Keluar</a>
                     </div>
                 </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="customer.php">
+                    <i class="fas fa-people-arrows"></i>
+                    <span> Data Customer</span></a>
             </li>
 
             <!-- Divider -->
@@ -165,10 +172,6 @@ $total_pages = ceil($total_data / $limit);
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
-                                </a>
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Logout
@@ -197,23 +200,17 @@ $total_pages = ceil($total_data / $limit);
 
                         <!-- Filter Tanggal -->
                         <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <form method="GET" class="form-inline mb-3">
-                                    <label for="limit" class="mr-2">Tampilkan: </label>
-                                    <select name="limit" id="limit" class="form-control mr-2" onchange="this.form.submit()">
-                                        <option value="5" <?= $limit == 5 ? 'selected' : ''; ?>>5</option>
-                                        <option value="10" <?= $limit == 10 ? 'selected' : ''; ?>>10</option>
-                                        <option value="15" <?= $limit == 15 ? 'selected' : ''; ?>>15</option>
-                                        <option value="20" <?= $limit == 20 ? 'selected' : ''; ?>>20</option>
-                                    </select>
-                                    <input type="hidden" name="search" value="<?= htmlspecialchars($search); ?>">
-                                    <input type="hidden" name="page" value="1">
-                                </form>
-
-
-                            </div>
-
-
+                            <!-- Dropdown untuk Mengatur Jumlah Data per Halaman -->
+                            <form method="GET" class="form-inline mb-3">
+                                <label for="limit" class="mr-2">Tampilkan: </label>
+                                <select name="limit" id="limit" class="form-control mr-2" onchange="this.form.submit()">
+                                    <option value="5" <?= $limit == 5 ? 'selected' : ''; ?>>5</option>
+                                    <option value="10" <?= $limit == 10 ? 'selected' : ''; ?>>10</option>
+                                    <option value="all" <?= $limit === 'all' ? 'selected' : ''; ?>>Semua</option>
+                                </select>
+                                <input type="hidden" name="search" value="<?= htmlspecialchars($search); ?>">
+                                <input type="hidden" name="page" value="1">
+                            </form>
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
@@ -227,64 +224,73 @@ $total_pages = ceil($total_data / $limit);
                                 </thead>
                                 <tbody>
                                     <?php
-
-                                    $where = " WHERE tb_barang.nama_barang LIKE '%$search%'";
-
-
-
+                                    // Query untuk mengambil data barang dan nama kategori
                                     $sql = "SELECT 
-                                tb_barangkeluar.id_keluar, 
-                                tb_barang.nama_barang, 
-                                tb_kategori.nama_kategori, 
-                                tb_customer.nama_customer,
-                                tb_barangkeluar.jumlah_keluar, 
-                                tb_barangkeluar.tanggal_keluar
-                            FROM 
-                                tb_barangkeluar
-                            INNER JOIN 
-                                tb_barang ON tb_barangkeluar.id_barang = tb_barang.id_barang
-                            INNER JOIN 
-                                tb_kategori ON tb_barang.id_kategori = tb_kategori.id_kategori
-                            INNER JOIN 
-                                tb_customer ON tb_barangkeluar.id_customer = tb_customer.id_customer
-                            $where
-                            LIMIT $offset, $limit";
+    tb_barangkeluar.id_keluar, 
+    tb_barang.nama_barang, 
+    tb_kategori.nama_kategori, 
+    tb_customer.nama_customer,
+    tb_barangkeluar.jumlah_keluar, 
+    tb_barangkeluar.tanggal_keluar
+FROM 
+    tb_barangkeluar
+INNER JOIN 
+    tb_barang ON tb_barangkeluar.id_barang = tb_barang.id_barang
+INNER JOIN 
+    tb_kategori ON tb_barang.id_kategori = tb_kategori.id_kategori
+INNER JOIN 
+    tb_customer ON tb_barangkeluar.id_customer = tb_customer.id_customer
+WHERE tb_barang.nama_barang LIKE '%$search%'
+ORDER BY tb_barangkeluar.tanggal_keluar DESC";
+
+
+                                    // Jika limit bukan "all", tambahkan LIMIT ke query
+                                    if ($limit !== 'all') {
+                                        $sql .= " LIMIT $offset, " . (int)$limit;
+                                    }
 
                                     $result = $config->query($sql);
 
                                     if ($result->num_rows > 0) {
-                                        $no = $offset + 1;
+                                        $no = $offset + 1; // Penomoran dimulai dari (offset + 1)
                                         while ($row = $result->fetch_assoc()) {
                                             echo "<tr>
-                                        <td>$no</td>
-                                        <td>{$row['nama_barang']}</td> 
-                                        <td>{$row['nama_kategori']}</td> 
-                                        <td>{$row['nama_customer']}</td> 
-                                        <td>{$row['jumlah_keluar']}</td> 
-                                        <td>{$row['tanggal_keluar']}</td> 
-                                    </tr>";
+            <td>$no</td>
+            <td>{$row['nama_barang']}</td> 
+            <td>{$row['nama_kategori']}</td> 
+            <td>{$row['nama_customer']}</td> 
+            <td>{$row['jumlah_keluar']}</td> 
+            <td>{$row['tanggal_keluar']}</td> 
+        </tr>";
                                             $no++;
                                         }
                                     } else {
-                                        echo "<tr><td colspan='7'>Tidak ada data barang</td></tr>";
+                                        // Sesuaikan jumlah kolom agar tampilan tabel tetap rapi
+                                        echo "<tr><td colspan='7' class='text-center'>Tidak ada data barang</td></tr>";
                                     }
                                     ?>
+
+
+
                                 </tbody>
                             </table>
+
                             <!-- Pagination -->
-                            <ul class="pagination">
-                                <li class="page-item <?= $page <= 1 ? 'disabled' : ''; ?>">
-                                    <a class="page-link" href="?page=<?= $page - 1; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Previous</a>
-                                </li>
-                                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                                    <li class="page-item <?= $i == $page ? 'active' : ''; ?>">
-                                        <a class="page-link" href="?page=<?= $i; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>"><?= $i; ?></a>
+                            <?php if ($limit !== 'all'): ?>
+                                <ul class="pagination">
+                                    <li class="page-item <?= $page <= 1 ? 'disabled' : ''; ?>">
+                                        <a class="page-link" href="?page=<?= $page - 1; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Previous</a>
                                     </li>
-                                <?php endfor; ?>
-                                <li class="page-item <?= $page >= $total_pages ? 'disabled' : ''; ?>">
-                                    <a class="page-link" href="?page=<?= $page + 1; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Next</a>
-                                </li>
-                            </ul>
+                                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                                        <li class="page-item <?= $i == $page ? 'active' : ''; ?>">
+                                            <a class="page-link" href="?page=<?= $i; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>"><?= $i; ?></a>
+                                        </li>
+                                    <?php endfor; ?>
+                                    <li class="page-item <?= $page >= $total_pages ? 'disabled' : ''; ?>">
+                                        <a class="page-link" href="?page=<?= $page + 1; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Next</a>
+                                    </li>
+                                </ul>
+                            <?php endif; ?>
                         </div>
                     </div>
 

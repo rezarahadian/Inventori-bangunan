@@ -2,6 +2,16 @@
 // menanggil koneksi database
 include 'config.php';
 ?>
+<?php
+session_start();
+
+// Periksa apakah session username sudah ada
+if (!isset($_SESSION['username'])) {
+    $_SESSION['username'] = 'Guest'; // Default jika belum login
+}
+
+
+?>
 <html>
 
 <head>
@@ -20,23 +30,6 @@ include 'config.php';
     <div class="container mt-4">
         <h2>Laporan Stok Barang</h2>
         <div class="data-tables datatable-dark">
-            <form method="POST">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="nama_barang">Nama Barang:</label>
-                            <input type="text" name="nama_barang" class="form-control" placeholder="Masukkan nama barang">
-                        </div>
-                    </div>
-                    <div class="col-md-6 align-self-end">
-                        <div class="form-group">
-                            <button type="submit" name="filter_nama" class="btn btn-sm btn-info">Filter</button>
-                            <button type="reset" class="btn btn-sm btn-secondary">Reset</button>
-
-                        </div>
-                    </div>
-                </div>
-            </form>
 
             <table id="mauexport" class="table table-striped table-bordered">
                 <thead>
@@ -88,6 +81,7 @@ include 'config.php';
                 </tbody>
             </table>
         </div>
+        <a href="laporanstok.php" class="btn-back">Kembali</a>
     </div>
 
     <style>
@@ -95,6 +89,50 @@ include 'config.php';
             border-top: 2px solid black;
             width: 100%;
             margin-bottom: 10mm;
+        }
+
+        .btn-back {
+            display: inline-block;
+            background-color: #A6CDC6;
+            /* Warna hijau sukses */
+            color: white;
+            padding: 5px 18px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s, transform 0.2s;
+            cursor: pointer;
+            box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-back:hover {
+            background-color: #A6CDC6;
+            /* Warna hijau lebih gelap */
+            transform: scale(1.05);
+        }
+
+        .btn-filter {
+            display: inline-block;
+            background-color: #A6CDC6;
+            /* Warna hijau sukses */
+            color: white;
+            padding: 5px 18px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s, transform 0.2s;
+            cursor: pointer;
+            box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-filter:hover {
+            background-color: #A6CDC6;
+            /* Warna hijau lebih gelap */
+            transform: scale(1.05);
         }
     </style>
 
@@ -157,8 +195,48 @@ include 'config.php';
                                     text: '\n'
                                 } // Spasi setelah garis pemisah
                             );
+
+                            // Tambahkan informasi tambahan di bagian bawah tabel
+                            var today = new Date();
+                            var formattedDate = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
+
+
+                            doc.content.push({
+                                text: `Tanggal Cetak Laporan: ${formattedDate}`,
+                                fontSize: 12,
+                                margin: [0, 20, 0, 2],
+                                alignment: 'left'
+                            }, {
+                                canvas: [{
+                                    type: 'line',
+                                    x1: 0,
+                                    y1: 0,
+                                    x2: 540,
+                                    y2: 0,
+                                    lineWidth: 1.5
+                                }]
+                            }, {
+                                text: '\n\n\n',
+                            }, {
+                                text: `Dibuat oleh: ${username} `,
+                                fontSize: 12,
+                                alignment: 'right',
+                                margin: [0, 5, 0, 2]
+                            }, {
+                                text: '\n\n\n\n\n',
+                            }, {
+                                text: "________________________",
+                                fontSize: 12,
+                                alignment: 'right',
+                                margin: [0, 5, 0, 2]
+                            }, {
+                                text: `Sebagai: ${role}`,
+                                fontSize: 12,
+                                alignment: 'right'
+                            });
                         }
                     },
+
 
 
                     {
@@ -169,31 +247,71 @@ include 'config.php';
                             $('row c[r]', sheet).attr('s', '42'); // Atur style Excel
                         }
                     },
+
                     {
                         extend: 'print',
                         text: 'Print',
                         customize: function(win) {
-                            $(win.document.body).css('text-align', 'center'); // Pusatkan teks
+                            $(win.document.body).css({
+                                'text-align': 'center',
+                                'font-family': 'Arial, sans-serif',
+                                'font-size': '12px',
+                            });
+
+                            // Tambahkan Header Toko
+                            $(win.document.body).prepend(`
+            <div style="text-align:center; font-size:16px; font-weight:bold;">Reza Jaya Bangunan</div>
+            <div style="text-align:center; font-size:12px;">Kp Cibitung, Ganjarsari, Kec. Cikalong Wetan, Kabupaten Bandung Barat, Jawa Barat 40556</div>
+            <div style="text-align:center; font-size:12px;">Telp: 0858-6444-9907</div>
+            <hr style="border:1.5px solid black; margin:10px 0;">
+        `);
+
+                            // Pastikan tabel memiliki styling yang sesuai
                             $(win.document.body).find('table').css({
                                 'width': '100%',
-                                'border-collapse': 'collapse'
+                                'border-collapse': 'collapse',
+                                'margin-top': '10px'
                             });
+
                             $(win.document.body).find('th, td').css({
                                 'border': '1px solid black',
                                 'padding': '8px',
                                 'text-align': 'center'
                             });
-                            $(win.document.body).prepend(
-                                '<div class="header">Reza Jaya Bangunan</div>' +
-                                '<div class="sub-header">Kp Cibitung, Ganjarsari, Kec. Cikalong Wetan, Kabupaten Bandung Barat, Jawa Barat 40556</div>' +
-                                '<div class="sub-header">Telp: 0858-6444-9907</div>' +
-                                '<div class="line"></div>'
-                            );
+
+                            // Ambil nilai filter tanggal dari form
+                            var today = new Date();
+                            var formattedDate = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
+                            var mulai = $('input[name="tgl_mulai"]').val();
+                            var selesai = $('input[name="tgl_selesai"]').val();
+                            var periodeText = (mulai && selesai) ? `Periode Laporan: ${mulai} s.d ${selesai}` : "Periode Laporan: Semua Data";
+
+
+                            // Tambahkan informasi di bagian bawah laporan
+                            $(win.document.body).append(`
+            <div style="text-align:left; margin-top:20px; font-size:12px;">Tanggal Cetak Laporan: ${formattedDate}</div>
+            <div style="text-align:left; font-size:12px;">${periodeText}</div>
+            <hr style="border:1.5px solid black; margin:10px 0;">
+            <br><br><br>
+            <div style="text-align:right; font-size:12px;">Dibuat oleh: ${username}</div>
+            <br><br><br><br>
+            <div style="text-align:right; font-size:12px;">________________________</div>
+            <div style="text-align:right; font-size:12px;">Sebagai: ${role}</div>
+        `);
                         }
                     }
+
                 ]
             });
         });
+    </script>
+    <script>
+        var username = "<?php echo isset($_SESSION['username']) ? $_SESSION['username'] : 'Nama Pengguna'; ?>";
+        var role = "<?php echo isset($_SESSION['role']) ? $_SESSION['role'] : 'Role Tidak Diketahui'; ?>";
+
+        function resetForm() {
+            window.location.href = window.location.pathname + "?reset=true"; // Reload halaman dengan reset
+        }
     </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>

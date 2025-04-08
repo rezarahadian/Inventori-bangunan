@@ -3,10 +3,19 @@
 include 'config.php';
 ?>
 <?php
-session_start(); // Mulai session jika belum dimulai
+session_start();
+
+// Periksa apakah session username sudah ada
 if (!isset($_SESSION['username'])) {
     $_SESSION['username'] = 'Guest'; // Default jika belum login
 }
+
+// Jika parameter reset ada di URL, lakukan redirect untuk membersihkan input
+if (isset($_GET['reset'])) {
+    header("Location: " . strtok($_SERVER["REQUEST_URI"], '?')); // Redirect tanpa parameter reset
+    exit(); // Pastikan script berhenti setelah redirect
+}
+
 
 ?>
 <html>
@@ -44,6 +53,7 @@ if (!isset($_SESSION['username'])) {
                     <div class="col-md-4 align-self-end">
                         <div class="form-group">
                             <button type="submit" name="filter_tgl" class="btn-filter">Filter</button>
+                            <button type="button" class="btn-filter btn-reset" onclick="resetForm()">Reset</button>
                         </div>
                     </div>
                 </div>
@@ -84,7 +94,7 @@ if (!isset($_SESSION['username'])) {
                         INNER JOIN 
                             tb_supplier ON tb_barangmasuk.id_supplier = tb_supplier.id_supplier
                         WHERE 
-                            tb_barangmasuk.tanggal_masuk BETWEEN '$mulai' AND DATE_ADD('$selesai', INTERVAL 1 DAY)";
+                            tb_barangmasuk.tanggal_masuk BETWEEN '$mulai' AND DATE_ADD('$selesai', INTERVAL 0 DAY)";
                         } else {
                             $sql = "SELECT 
                             tb_barangmasuk.id_masuk, 
@@ -149,11 +159,13 @@ if (!isset($_SESSION['username'])) {
             width: 100%;
             margin-bottom: 10mm;
         }
+
         .btn-back {
             display: inline-block;
-            background-color: #A6CDC6; /* Warna hijau sukses */
+            background-color: #A6CDC6;
+            /* Warna hijau sukses */
             color: white;
-            padding: 12px 20px;
+            padding: 5px 18px;
             border: none;
             border-radius: 8px;
             text-decoration: none;
@@ -165,12 +177,15 @@ if (!isset($_SESSION['username'])) {
         }
 
         .btn-back:hover {
-            background-color: #A6CDC6; /* Warna hijau lebih gelap */
+            background-color: #A6CDC6;
+            /* Warna hijau lebih gelap */
             transform: scale(1.05);
         }
+
         .btn-filter {
             display: inline-block;
-            background-color: #A6CDC6; /* Warna hijau sukses */
+            background-color: #A6CDC6;
+            /* Warna hijau sukses */
             color: white;
             padding: 5px 18px;
             border: none;
@@ -184,10 +199,10 @@ if (!isset($_SESSION['username'])) {
         }
 
         .btn-filter:hover {
-            background-color: #A6CDC6; /* Warna hijau lebih gelap */
+            background-color: #A6CDC6;
+            /* Warna hijau lebih gelap */
             transform: scale(1.05);
         }
-
     </style>
 
 
@@ -304,7 +319,7 @@ if (!isset($_SESSION['username'])) {
                             $('row c[r]', sheet).attr('s', '42'); // Atur style Excel
                         }
                     },
-                    
+
                     {
                         extend: 'print',
                         text: 'Print',
@@ -368,6 +383,10 @@ if (!isset($_SESSION['username'])) {
         var mulai = "<?= isset($_POST['tgl_mulai']) ? $_POST['tgl_mulai'] : '' ?>";
         var selesai = "<?= isset($_POST['tgl_selesai']) ? $_POST['tgl_selesai'] : '' ?>";
         var periodeText = (mulai && selesai) ? `Periode Laporan: ${mulai} s.d ${selesai}` : "Periode Laporan: Semua Data";
+
+        function resetForm() {
+            window.location.href = window.location.pathname + "?reset=true"; // Reload halaman dengan reset
+        }
     </script>
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>

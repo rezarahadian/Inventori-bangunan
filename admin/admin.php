@@ -11,7 +11,7 @@ if (empty($_SESSION['username']) || empty($_SESSION['role'])) {
     exit();
 }
 // Ambil data username dan role dari sesi
-$username = $_SESSION['username']; 
+$username = $_SESSION['username'];
 $role = $_SESSION['role'];
 
 // barang masuk
@@ -64,6 +64,7 @@ if ($result && $row = $result->fetch_assoc()) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -76,11 +77,12 @@ if ($result && $row = $result->fetch_assoc()) {
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <link href="admin.css" rel="stylesheet">
 </head>
+
 <body id="page-top">
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -90,7 +92,7 @@ if ($result && $row = $result->fetch_assoc()) {
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
                 <div class="sidebar-brand-icon rotate-n-1">
-                <i class="fas fa-university"></i>
+                    <i class="fas fa-university"></i>
                 </div>
                 <div class="sidebar-brand-text mx-1"> Reza Jaya Bangunan</div>
             </a>
@@ -99,59 +101,59 @@ if ($result && $row = $result->fetch_assoc()) {
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
                 <a class="nav-link" href="admin.php">
-                <i class="fas fa-fw fa-th"></i>
-                    <span >Dashboard</span></a>
+                    <i class="fas fa-fw fa-th"></i>
+                    <span>Dashboard</span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="user.php">
-                <i class="fas fa-users"></i>
+                    <i class="fas fa-users"></i>
                     <span> Data User</span></a>
             </li>
             <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBarang"
-                        aria-expanded="true" aria-controls="collapseBarang">
-                        <i class="fas fa-box-open"></i>
-                        <span>Data Barang</span>
-                    </a>
-                    <div id="collapseBarang" class="collapse" aria-labelledby="headingBarang" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <h6 class="collapse-header">Data Barang:</h6>
-                            <a class="collapse-item" href="barang.php">Barang</a>
-                            <a class="collapse-item" href="satuan.php">Satuan</a>
-                            <a class="collapse-item" href="kategori.php">Kategori</a>
-                            <a class="collapse-item" href="stokbarang.php">Stok Barang</a>
-                            <a class="collapse-item" href="barangmasuk.php">Barang Masuk</a>
-                            <a class="collapse-item" href="barangkeluar.php">Barang Keluar</a>
-                        </div>
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBarang"
+                    aria-expanded="true" aria-controls="collapseBarang">
+                    <i class="fas fa-box-open"></i>
+                    <span>Data Barang</span>
+                </a>
+                <div id="collapseBarang" class="collapse" aria-labelledby="headingBarang" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Data Barang:</h6>
+                        <a class="collapse-item" href="barang.php">Barang</a>
+                        <a class="collapse-item" href="satuan.php">Satuan</a>
+                        <a class="collapse-item" href="kategori.php">Kategori</a>
+                        <a class="collapse-item" href="stokbarang.php">Stok Barang</a>
+                        <a class="collapse-item" href="barangmasuk.php">Barang Masuk</a>
+                        <a class="collapse-item" href="barangkeluar.php">Barang Keluar</a>
                     </div>
-                </li>
-               
+                </div>
+            </li>
+
             <li class="nav-item">
                 <a class="nav-link" href="supplier.php">
-                  <i class="fas fa-people-arrows"></i>
+                    <i class="fas fa-people-arrows"></i>
                     <span> Data Supplier</span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="customer.php">
-                <i class="fas fa-people-arrows"></i>
+                    <i class="fas fa-people-arrows"></i>
                     <span> Data Customer</span></a>
             </li>
             <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLaporan"
-                        aria-expanded="true" aria-controls="collapseLaporan">
-                        <i class="fas fa-sticky-note"></i>
-                        <span>Data Laporan</span>
-                    </a>
-                    <div id="collapseLaporan" class="collapse" aria-labelledby="headingLaporan" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <h6 class="collapse-header">Laporan:</h6>
-                            <a class="collapse-item" href="laporanstok.php">Laporan Stok Barang</a>
-                            <a class="collapse-item" href="laporanmasuk.php">Laporan Barang Masuk</a>
-                            <a class="collapse-item" href="laporankeluar.php">Laporan Barang Keluar</a>
-                        </div>
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLaporan"
+                    aria-expanded="true" aria-controls="collapseLaporan">
+                    <i class="fas fa-sticky-note"></i>
+                    <span>Data Laporan</span>
+                </a>
+                <div id="collapseLaporan" class="collapse" aria-labelledby="headingLaporan" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Laporan:</h6>
+                        <a class="collapse-item" href="laporanstok.php">Laporan Stok Barang</a>
+                        <a class="collapse-item" href="laporanmasuk.php">Laporan Barang Masuk</a>
+                        <a class="collapse-item" href="laporankeluar.php">Laporan Barang Keluar</a>
                     </div>
-                </li>
-            
+                </div>
+            </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 
@@ -198,27 +200,24 @@ if ($result && $row = $result->fetch_assoc()) {
                             </div>
                         </li>
                         <div class="topbar-divider d-none d-sm-block"></div>
-                            
+
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                <?php echo ucfirst(string: $role); ?> <!-- untuk menamnpilkan level ucfirst untuk hurup awal agar kapital-->
-                                </span> 
+                                    <?php echo ucfirst(string: $role); ?> <!-- untuk menamnpilkan level ucfirst untuk hurup awal agar kapital-->
+                                </span>
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
-                                </a>
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Logout
                                 </a>
                             </div>
+
                         </li>
                     </ul>
                 </nav>
@@ -229,41 +228,41 @@ if ($result && $row = $result->fetch_assoc()) {
                     <h1 class="fontuser">Dashboard</h1>
                     <br>
                     <div class="row">
-                     <!-- Earnings (Monthly) Card Example -->
-                     <div id="layoutSidenav_content">
-                <main>
-                    <div class="container-fluid px-4">
-                    <section class="main">
-          <div class="main-skills">
-            <div class="card">
-              <i class="fas fa-cart-plus"></i>
-              <h3>Total Barang Masuk</h3>
-              <p><?php echo $jumlah_barangmasuk; ?> Barang</p>
-              <button> <a href="barangmasuk.php">Lihat Detail</a></button>
-            </div>
-            <div class="card">
-              <i class="fas fa-cart-arrow-down"></i>
-              <h3>Total Barang Keluar</h3>
-              <p><?php echo $jumlah_barangkeluar; ?> Barang</p>
-              <button> <a href="barangkeluar.php">Lihat Detail</a></button>
-            </div>
-            <div class="card">
-            <i class="fas fa-truck"></i>
-              <h3>Total Data Supplier</h3>
-              <p><?php echo $jumlah_customer; ?> Supplier</p>
-              <button> <a href="supplier.php">Lihat Detail</a></button>
-            </div>
-            
-            <div class="card">
-              <i class="fas fa-people-arrows"></i>
-              <h3>Total Data Customer</h3>
-              <p><?php echo $jumlah_customer; ?> Customer</p>
-              <button> <a href="customer.php">Lihat Detail</a></button>
-            </div>
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div id="layoutSidenav_content">
+                            <main>
+                                <div class="container-fluid px-4">
+                                    <section class="main">
+                                        <div class="main-skills">
+                                            <div class="card">
+                                                <i class="fas fa-cart-plus"></i>
+                                                <h3>Total Barang Masuk</h3>
+                                                <p><?php echo $jumlah_barangmasuk; ?> Barang</p>
+                                                <button> <a href="barangmasuk.php">Lihat Detail</a></button>
+                                            </div>
+                                            <div class="card">
+                                                <i class="fas fa-cart-arrow-down"></i>
+                                                <h3>Total Barang Keluar</h3>
+                                                <p><?php echo $jumlah_barangkeluar; ?> Barang</p>
+                                                <button> <a href="barangkeluar.php">Lihat Detail</a></button>
+                                            </div>
+                                            <div class="card">
+                                                <i class="fas fa-truck"></i>
+                                                <h3>Total Data Supplier</h3>
+                                                <p><?php echo $jumlah_customer; ?> Supplier</p>
+                                                <button> <a href="supplier.php">Lihat Detail</a></button>
+                                            </div>
+
+                                            <div class="card">
+                                                <i class="fas fa-people-arrows"></i>
+                                                <h3>Total Data Customer</h3>
+                                                <p><?php echo $jumlah_customer; ?> Customer</p>
+                                                <button> <a href="customer.php">Lihat Detail</a></button>
+                                            </div>
+                                        </div>
+                                </div>
+                            </main>
                         </div>
-                    </div>
-                </main>
-            </div>
 
                     </div>
                 </div>

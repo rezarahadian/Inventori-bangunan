@@ -17,13 +17,33 @@ $role = $_SESSION['role'];
 // Tambah Data Barang Masuk
 if (isset($_POST['add_barangmasuk'])) {
     $id_barang = $_POST['id_barang'];
-    $id_kategori = $_POST['id_kategori'];
     $id_supplier = $_POST['id_supplier'];
     $jumlah_masuk = $_POST['jumlah_masuk'];
     $tanggal_masuk = $_POST['tanggal_masuk'];
 
+     // Validasi agar hanya bisa memilih tanggal hari ini atau setelahnya
+     $tanggalSekarang = strtotime(date('Y-m-d')); // Waktu sekarang
+     $tanggalInput = strtotime($tanggal_masuk); // Waktu input dari form
+ 
+     if ($tanggalInput < $tanggalSekarang) {
+         echo "<script>alert('Tanggal masuk tidak boleh memilih tanggal yang telah lewat'); window.history.back();</script>";
+         exit();
+     }
+
+    // Ambil ID Kategori berdasarkan Barang yang Dipilih
+    $kategoriSql = "SELECT id_kategori FROM tb_barang WHERE id_barang = '$id_barang'";
+    $kategoriResult = $config->query($kategoriSql);
+    if ($kategoriResult->num_rows > 0) {
+        $kategoriRow = $kategoriResult->fetch_assoc();
+        $id_kategori = $kategoriRow['id_kategori']; // Ambil ID kategori yang sesuai
+    } else {
+        echo "<script>alert('Kategori tidak ditemukan!');</script>";
+        exit(); // Hentikan eksekusi jika kategori tidak ditemukan
+    }
+
+    // Insert Data ke tb_barangmasuk
     $insertSql = "INSERT INTO tb_barangmasuk (id_barang, id_kategori, id_supplier, jumlah_masuk, tanggal_masuk) 
-                  VALUES ('$id_barang', '$id_kategori','$id_supplier', '$jumlah_masuk', '$tanggal_masuk')";
+                  VALUES ('$id_barang', '$id_kategori', '$id_supplier', '$jumlah_masuk', '$tanggal_masuk')";
 
     if ($config->query($insertSql)) {
         echo "<script>alert('Data berhasil ditambahkan!'); window.location.href='barangmasuk.php';</script>";
@@ -31,6 +51,7 @@ if (isset($_POST['add_barangmasuk'])) {
         echo "<script>alert('Gagal menambahkan data: " . $config->error . "');</script>";
     }
 }
+
 
 if (isset($_POST['update_barangmasuk'])) {
     $id_masuk = $_POST['id_masuk'];
@@ -47,17 +68,6 @@ if (isset($_POST['update_barangmasuk'])) {
 }
 
 
-// Hapus Data Barang Masuk
-if (isset($_GET['delete'])) {
-    $id_masuk = $_GET['delete'];
-    $sql = "DELETE FROM tb_barangmasuk WHERE id_masuk='$id_masuk'";
-
-    if ($config->query($sql)) {
-        echo "<script>alert('Data berhasil dihapus!'); window.location.href='barangmasuk.php';</script>";
-    } else {
-        echo "<script>alert('Gagal menghapus data: " . $config->error . "');</script>";
-    }
-}
 
 // Ambil data user berdasarkan ID untuk ditampilkan di modal
 if (isset($_GET['id_barang'])) {
@@ -68,27 +78,26 @@ if (isset($_GET['id_barang'])) {
 }
 
 // Tentukan jumlah data per halaman (default: 5 data per halaman)
-$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5;
+$limit = isset($_GET['limit']) ? ($_GET['limit'] == 'all' ? 'all' : (int)$_GET['limit']) : 5;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $page = max($page, 1); // Pastikan page minimal 1
+$offset = ($page - 1) * ($limit === 'all' ? 0 : $limit);
 
 // Fitur Pencarian
 $search = isset($_GET['search']) ? mysqli_real_escape_string($config, $_GET['search']) : '';
 
-// Query untuk menghitung jumlah total data dengan pencarian
-$query_count = "SELECT COUNT(*) AS total FROM tb_barang WHERE nama_barang LIKE '%$search%'";
+// Query untuk mendapatkan data dengan pagination dan pencarian
+$query = "SELECT * FROM tb_barang WHERE nama_barang LIKE '%$search%'";
+if ($limit !== 'all') {
+    $query .= " LIMIT $limit OFFSET $offset";
+}
+$result = mysqli_query($config, $query);
+
+// Query untuk menghitung jumlah total data dari tabel tb_barangkeluar dengan pencarian
+$query_count = "SELECT COUNT(*) AS total FROM tb_barangmasuk WHERE id_barang LIKE '%$search%'";
 $count_result = mysqli_query($config, $query_count);
 $total_data = mysqli_fetch_assoc($count_result)['total'];
-
-// Menghitung jumlah total halaman
-$total_pages = max(ceil($total_data / $limit), 1);
-$page = min($page, $total_pages); // Pastikan page tidak melebihi total_pages
-
-$offset = ($page - 1) * $limit;
-
-// Query untuk mendapatkan data dengan pagination dan pencarian
-$query = "SELECT * FROM tb_barang WHERE nama_barang LIKE '%$search%' LIMIT $limit OFFSET $offset";
-$result = mysqli_query($config, $query);
+$total_pages = $limit === 'all' ? 1 : ceil($total_data / $limit);
 
 ?>
 <!DOCTYPE html>
@@ -150,7 +159,6 @@ $result = mysqli_query($config, $query);
             </li>
 
 
-
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLaporan"
                     aria-expanded="true" aria-controls="collapseLaporan">
@@ -165,6 +173,11 @@ $result = mysqli_query($config, $query);
                         <a class="collapse-item" href="laporankeluar.php">Laporan Barang Keluar</a>
                     </div>
                 </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="customer.php">
+                    <i class="fas fa-people-arrows"></i>
+                    <span> Data Customer</span></a>
             </li>
 
             <!-- Divider -->
@@ -224,10 +237,6 @@ $result = mysqli_query($config, $query);
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
-                                </a>
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Logout
@@ -262,6 +271,7 @@ $result = mysqli_query($config, $query);
                                     <option value="10" <?= $limit == 10 ? 'selected' : ''; ?>>10</option>
                                     <option value="15" <?= $limit == 15 ? 'selected' : ''; ?>>15</option>
                                     <option value="20" <?= $limit == 20 ? 'selected' : ''; ?>>20</option>
+                                    <option value="all" <?= $limit === 'all' ? 'selected' : ''; ?>>Semua</option>
                                 </select>
                                 <input type="hidden" name="search" value="<?= htmlspecialchars($search); ?>">
                                 <input type="hidden" name="page" value="1">
@@ -275,7 +285,7 @@ $result = mysqli_query($config, $query);
                                         <th>Supplier</th>
                                         <th>Jumlah Masuk</th>
                                         <th>Tanggal Masuk</th>
-                                        <th>Aksi</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -297,7 +307,12 @@ INNER JOIN
 INNER JOIN 
     tb_supplier ON tb_barangmasuk.id_supplier = tb_supplier.id_supplier
      WHERE tb_barang.nama_barang LIKE '%$search%'
- LIMIT $offset, $limit";
+     ORDER BY tb_barangmasuk.tanggal_masuk DESC";
+
+                                    // Jika limit bukan "all", tambahkan LIMIT ke query
+                                    if ($limit !== 'all') {
+                                        $sql .= " LIMIT $offset, " . (int)$limit;
+                                    }
 
                                     $result = $config->query($sql);
 
@@ -311,19 +326,13 @@ INNER JOIN
             <td>{$row['nama_supplier']}</td> 
             <td>{$row['jumlah_masuk']}</td> 
               <td>{$row['tanggal_masuk']}</td> 
-            <td>
-                <button class='btn btn-transparent btn-sm' data-toggle='modal' data-target='#editDataModal{$row['id_masuk']}'>
-                    <i class='fas fa-edit'></i>
-                </button>
-                <a href='?delete={$row['id_masuk']}' class='btn btn-transparent btn-sm' onclick='return confirm(\"Hapus data ini?\")'>
-                    <i class='fas fa-trash-alt'></i>
-                </a>
-            </td>
+           
         </tr>";
                                             $no++;
                                         }
                                     } else {
-                                        echo "<tr><td colspan='5'>Tidak ada data barang</td></tr>";
+                                        // Sesuaikan jumlah kolom agar tampilan tabel tetap rapi
+                                        echo "<tr><td colspan='7' class='text-center'>Tidak ada data barang</td></tr>";
                                     }
                                     ?>
 
@@ -332,23 +341,21 @@ INNER JOIN
                             </table>
 
                             <!-- Pagination -->
-                            <ul class="pagination">
-                                <!-- Tombol Previous -->
-                                <li class="page-item <?= ($page <= 1) ? 'disabled' : ''; ?>">
-                                    <a class="page-link" href="?page=<?= max($page - 1, 1); ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Previous</a>
-                                </li>
-
-                                <!-- Nomor Halaman -->
-                                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                                    <li class="page-item <?= ($i == $page) ? 'active' : ''; ?>">
-                                        <a class="page-link" href="?page=<?= $i; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>"><?= $i; ?></a>
+                            <?php if ($limit !== 'all'): ?>
+                                <ul class="pagination">
+                                    <li class="page-item <?= $page <= 1 ? 'disabled' : ''; ?>">
+                                        <a class="page-link" href="?page=<?= $page - 1; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Previous</a>
                                     </li>
-                                <?php endfor; ?>
-
-                                <!-- Tombol Next -->
-                                <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : ''; ?>">
-                                    <a class="page-link" href="?page=<?= min($page + 1, $total_pages); ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Next</a>
-                                </li>
+                                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                                        <li class="page-item <?= $i == $page ? 'active' : ''; ?>">
+                                            <a class="page-link" href="?page=<?= $i; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>"><?= $i; ?></a>
+                                        </li>
+                                    <?php endfor; ?>
+                                    <li class="page-item <?= $page >= $total_pages ? 'disabled' : ''; ?>">
+                                        <a class="page-link" href="?page=<?= $page + 1; ?>&limit=<?= $limit; ?>&search=<?= urlencode($search); ?>">Next</a>
+                                    </li>
+                                </ul>
+                            <?php endif; ?>
                             </ul>
 
                         </div><!-- End of Page Content -->
@@ -413,33 +420,33 @@ INNER JOIN
                                         <h5 class="modal-title" id="tambahDataModalLabel">Tambah Data Barang Masuk</h5>
                                     </div>
                                     <div class="modal-body">
-                                        <!-- Memilih Barang -->
-                                        <div class="form-group">
-                                            <label for="id_barang">Nama Barang</label>
-                                            <select class="form-control" id="id_barang" name="id_barang" required>
-                                                <?php
-                                                // Mengambil daftar barang dari tb_barang
-                                                $barangSql = "SELECT * FROM tb_barang";
-                                                $barangResult = $config->query($barangSql);
-                                                while ($barang = $barangResult->fetch_assoc()) {
-                                                    echo "<option value='" . $barang['id_barang'] . "'>" . $barang['nama_barang'] . "</option>";
-                                                }
-                                                ?>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="id_kategori">Nama Kategori</label>
-                                            <select class="form-control" id="id_kategori" name="id_kategori" required>
-                                                <?php
-                                                // Mengambil daftar barang dari tb_barang
-                                                $barangSql = "SELECT * FROM tb_kategori";
-                                                $barangResult = $config->query($barangSql);
-                                                while ($barang = $barangResult->fetch_assoc()) {
-                                                    echo "<option value='" . $barang['id_kategori'] . "'>" . $barang['nama_kategori'] . "</option>";
-                                                }
-                                                ?>
-                                            </select>
-                                        </div>
+                                       <!-- Memilih Barang -->
+<div class="form-group">
+    <label for="id_barang">Nama Barang</label>
+    <select class="form-control" id="id_barang" name="id_barang" required>
+    <?php
+    // Mengambil daftar barang beserta kategorinya
+    $barangSql = "SELECT tb_barang.id_barang, tb_barang.nama_barang, tb_kategori.nama_kategori 
+                  FROM tb_barang 
+                  JOIN tb_kategori ON tb_barang.id_kategori = tb_kategori.id_kategori";
+    $barangResult = $config->query($barangSql);
+    while ($barang = $barangResult->fetch_assoc()) {
+        echo "<option value='" . $barang['id_barang'] . "' 
+                data-nama-kategori='" . $barang['nama_kategori'] . "'>" 
+                . $barang['nama_barang'] . 
+              "</option>";
+    }
+    ?>
+</select>
+
+</div>
+
+<!-- Kategori Otomatis -->
+<div class="form-group">
+    <label for="id_kategori">Nama Kategori</label>
+    <input type="text" class="form-control" id="kategori" name="id_kategori" readonly>
+</div>
+
 
                                         <!-- Memilih Supplier -->
                                         <div class="form-group">
@@ -476,6 +483,28 @@ INNER JOIN
                             </form>
                         </div>
                     </div>
+                    <script>
+                                       document.addEventListener("DOMContentLoaded", function () {
+        let today = new Date(); // Ambil tanggal hari ini
+        let minDate = today.toISOString().split('T')[0]; // Format YYYY-MM-DD
+        document.getElementById("tanggal_masuk").setAttribute("min", minDate);
+    });
+    document.getElementById("id_barang").addEventListener("change", function () {
+        var selectedOption = this.options[this.selectedIndex];
+        var kategoriNama = selectedOption.getAttribute("data-nama-kategori"); // Ambil nama kategori
+        document.getElementById("kategori").value = kategoriNama; // Masukkan ke input kategori
+    });
+
+    // Memuat kategori secara otomatis saat halaman pertama kali dimuat
+    window.onload = function() {
+        var barangSelect = document.getElementById("id_barang");
+        var selectedOption = barangSelect.options[barangSelect.selectedIndex];
+        if (selectedOption) {
+            document.getElementById("kategori").value = selectedOption.getAttribute("data-nama-kategori");
+        }
+    };
+</script>
+
 
 
 

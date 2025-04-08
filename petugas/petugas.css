@@ -1,127 +1,170 @@
 #wrapper .sidebar {
-    background: #d4f1f4;
+  background: #d4f1f4;
 }
+
 /* Ubah warna teks pada sidebar */
 .sidebar .nav-link,
 .sidebar .sidebar-brand-text {
-    color: #0a3d62 !important; /* Warna putih */
+  color: #0a3d62 !important;
+  /* Warna putih */
 }
 
 /* Ubah warna ikon pada sidebar */
 .sidebar .nav-link i {
-    color: #0a3d62 !important; /* Warna putih */
+  color: #0a3d62 !important;
+  /* Warna putih */
 }
+
 /* Ubah warna ikon pada sidebar */
 .sidebar .sidebar-brand-icon i {
-    color: #0a3d62; /* Warna biru tua */
+  color: #0a3d62;
+  /* Warna biru tua */
 }
 
 /* Warna hover untuk tautan di sidebar */
 .sidebar .nav-link:hover {
-    background-color: #f1f1f1 !important; /* Warna abu-abu terang */
+  background-color: #f1f1f1 !important;
+  /* Warna abu-abu terang */
 }
+
 .fontuser {
-    color: #0a3d62; /* Warna teks biru gelap yang harmonis dengan sidebar */
-    font-size: 25px; /* Ukuran font */
-    margin-top: 15px;
-    font-weight: bold;
- 
+  color: #0a3d62;
+  /* Warna teks biru gelap yang harmonis dengan sidebar */
+  font-size: 25px;
+  /* Ukuran font */
+  margin-top: 15px;
+  font-weight: bold;
+
 }
+
 /* Main Section */
-.main{
-    position: relative;
-    width: 100%;
-  }
-  .main-top{
-    display: flex;
-    width: 100%;
-  }
-  .main-skills{
-    display: flex;
-    margin-top: 0px;
-  }
-  .main-skills .card{
-    width: 25%;
-    margin: 10px;
-    background: #fff;
-    text-align: center;
-    border-radius: 20px;
-    padding: 10px;
-    box-shadow: 0 20px 35px rgba(106, 162, 180, 0.1);
-  }
-  .main-skills .card button:hover{
-    background: #7dbbc2;
-  }
-  .main-skills .card i{
-    font-size: 22px;
-    padding: 10px;
-  }
-  /* Menghilangkan garis bawah pada link */
+.main {
+  position: relative;
+  width: 100%;
+}
+
+.main-top {
+  display: flex;
+  width: 100%;
+}
+
+.main-skills {
+  display: flex;
+  margin-top: 0px;
+}
+
+.main-skills .card {
+  width: 25%;
+  margin: 10px;
+  background: #fff;
+  text-align: center;
+  border-radius: 20px;
+  padding: 10px;
+  box-shadow: 0 20px 35px rgba(106, 162, 180, 0.1);
+}
+
+.main-skills .card button:hover {
+  background: #7dbbc2;
+}
+
+.main-skills .card i {
+  font-size: 22px;
+  padding: 10px;
+}
+
+/* Menghilangkan garis bawah pada link */
 button a {
-  text-decoration: none; /* Menghilangkan garis bawah */
-  color: #e8e8e8; /* Mengganti warna font link menjadi biru (ganti dengan warna yang diinginkan) */
+  text-decoration: none;
+  /* Menghilangkan garis bawah */
+  color: #e8e8e8;
+  /* Mengganti warna font link menjadi biru (ganti dengan warna yang diinginkan) */
 }
 
 /* Mengubah warna link saat hover */
 button a:hover {
-  color: #fff; /* Mengubah warna saat hover (opsional) */
+  color: #fff;
+  /* Mengubah warna saat hover (opsional) */
 }
+
 .card i {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-    color: #0a3d62; /* Change the icon color */
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  color: #0a3d62;
+  /* Change the icon color */
 }
+
 /* Heading styles */
 .card h3 {
-    font-size: 1.rem;
-    color: #0a3d62; /* Change text color */
-    margin-bottom: 10px;
+  font-size: 1.rem;
+  color: #0a3d62;
+  /* Change text color */
+  margin-bottom: 10px;
 }
+
 /* Button styles */
 .card button {
-    background-color: #a9d8dd;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 15px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+  background-color: #a9d8dd;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 15px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
+
 /* Link inside the button */
 .card button a {
-    text-decoration: none;
-    color: #0a3d62;
+  text-decoration: none;
+  color: #0a3d62;
 }
+
 /* Tombol Simpan */
 .modal-footer .btn-primary {
-  background-color: #a9d8dd; /* Ganti warna latar belakang tombol Simpan */
-  border-color: #d4f1f4; /* Ganti warna border tombol Simpan */
-  color: #fff; /* Ganti warna teks tombol Simpan */
-  font-size: 15px; /* Ubah ukuran font */
-  padding: 5px 20px; /* Ubah ukuran padding untuk memperbesar tombol */
-  border-radius: 60px; /* Membuat sudut tombol lebih halus */
+  background-color: #a9d8dd;
+  /* Ganti warna latar belakang tombol Simpan */
+  border-color: #d4f1f4;
+  /* Ganti warna border tombol Simpan */
+  color: #fff;
+  /* Ganti warna teks tombol Simpan */
+  font-size: 15px;
+  /* Ubah ukuran font */
+  padding: 5px 20px;
+  /* Ubah ukuran padding untuk memperbesar tombol */
+  border-radius: 60px;
+  /* Membuat sudut tombol lebih halus */
 }
 
 .modal-footer .btn-primary:hover {
-  background-color: #79bdc5; /* Warna latar belakang saat tombol Simpan di-hover */
-  border-color: #a9d8dd; /* Warna border saat tombol Simpan di-hover */
+  background-color: #79bdc5;
+  /* Warna latar belakang saat tombol Simpan di-hover */
+  border-color: #a9d8dd;
+  /* Warna border saat tombol Simpan di-hover */
 }
 
 /* Tombol Batal */
 .modal-footer .btn-secondary {
-  background-color: #A6AEBF; /* Ganti warna latar belakang tombol Batal */
-  border-color: #A6AEBF; /* Ganti warna border tombol Batal */
-  color: #fff; /* Ganti warna teks tombol Batal */
-  font-size: 15px; /* Ubah ukuran font */
-  padding: 5px 20px; /* Ubah ukuran padding untuk memperbesar tombol */
-  border-radius: 30px; /* Membuat sudut tombol lebih halus */
+  background-color: #A6AEBF;
+  /* Ganti warna latar belakang tombol Batal */
+  border-color: #A6AEBF;
+  /* Ganti warna border tombol Batal */
+  color: #fff;
+  /* Ganti warna teks tombol Batal */
+  font-size: 15px;
+  /* Ubah ukuran font */
+  padding: 5px 20px;
+  /* Ubah ukuran padding untuk memperbesar tombol */
+  border-radius: 30px;
+  /* Membuat sudut tombol lebih halus */
 }
 
 .modal-footer .btn-secondary:hover {
-  background-color: #848ea3; /* Warna latar belakang saat tombol Batal di-hover */
-  border-color:#848ea3; /* Warna border saat tombol Batal di-hover */
+  background-color: #848ea3;
+  /* Warna latar belakang saat tombol Batal di-hover */
+  border-color: #848ea3;
+  /* Warna border saat tombol Batal di-hover */
 }
+
 .modal-header {
   background-color: #d4f1f4;
   color: #0a3d62;
@@ -146,7 +189,3 @@ button a:hover {
   background: transparent;
   border: none;
 }
-
-
-
-  
